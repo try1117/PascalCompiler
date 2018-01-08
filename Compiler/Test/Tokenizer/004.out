@@ -1,0 +1,4 @@
+0  | 3  | CONST_INTEGER            | 282930                   | 282930
+1  | 2  | CONST_INTEGER            | 111                      | 111
+2  | 1  | CONST_INTEGER            | 123                      | 123
+3  | 0  | CONST_INTEGER            | 456                      | 456
