@@ -9,10 +9,13 @@ FileReader::FileReader(std::string fileName)
 char FileReader::nextSymbol()
 {
 	if (col + 1 >= curLine.length()) {
-		if (!std::getline(input, curLine)) {
-			return 0;
-		}
-		++row;
+		do {
+			if (!std::getline(input, curLine)) {
+				return 0;
+			}
+			++row;
+		} while (curLine.empty());
+
 		col = -1;
 	}
 

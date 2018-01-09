@@ -286,3 +286,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Temporary files
+/Compiler/Compiler/output.txt

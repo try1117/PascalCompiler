@@ -89,9 +89,21 @@ Tokenizer::Tokenizer(std::string fileName) :
 {
 }
 
-bool wordSymbol(char c)
+bool wordFirstSymbol(char c)
 {
 	return (isalpha(c) || c == '_' || c == '\'');
+}
+
+bool wordSymbol(char c)
+{
+	return (isalpha(c) || isdigit(c) || c == '_');
+}
+
+void throwLexicalException(int row, int col, std::string message)
+{
+	char cMes[200];
+	sprintf(cMes, "Lexical exception in row : %d column : %d - %s", row, col, message.c_str());
+	throw std::exception(cMes);
 }
 
 bool Tokenizer::next()
@@ -102,7 +114,7 @@ bool Tokenizer::next()
 	if (c == 0)
 		return false;
 
-	if (wordSymbol(c)) {
+	if (wordFirstSymbol(c)) {
 		parseWord(c);
 	}
 	else if (separators.count(std::string({ c }))) {
@@ -254,9 +266,59 @@ void Tokenizer::parseNumber(char c)
 	}
 }
 
+
+
 void Tokenizer::parseWord(char c)
 {
+	tokenRow = reader.getRow();
+	tokenCol = reader.getCol();
 
+	tokenText = "";
+	if (c == '\'') {
+		while (true) {
+			if (reader.endOfLine()) {
+				throwLexicalException(tokenRow, tokenCol, "Missing terminating ' character");
+				return;
+			}
+
+			c = reader.nextSymbol();
+			
+			// end of the string
+			// or symbol apostrophe that is inside the string
+			if (c == '\'' && reader.endOfLine()) {
+				break;
+			}
+			if (c == '\'' && reader.nextSymbol() != '\'') {
+				reader.symbolRollback();
+				break;
+			}
+			tokenText.push_back(c);
+		}
+		token = CONST_STRING;
+		return;
+	}
+	
+	while (true) {
+		tokenText.push_back(c);
+		if (reader.endOfLine()) {
+			break;
+		}
+		c = reader.nextSymbol();
+		if (!wordSymbol(c)) {
+			reader.symbolRollback();
+			break;
+		}
+	}
+	
+	std::string low = tokenText;
+	std::transform(low.begin(), low.end(), low.begin(), ::tolower);
+
+	if (keywords.count(low)) {
+		token = keywords[low];
+	}
+	else {
+		token = VARIABLE;
+	}
 }
 
 void Tokenizer::parseSeparator(char c)
