@@ -1,0 +1,6 @@
+begin{ multi
+  line
+  comment
+}
+  var abs 'qwerty'
+end.

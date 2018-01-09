@@ -1,5 +1,0 @@
-0  | 1  | CONST_INTEGER            | 1                        | 1
-0  | 3  | CONST_INTEGER            | 2                        | 2
-0  | 5  | CONST_INTEGER            | 3                        | 3
-0  | 7  | CONST_INTEGER            | 4                        | 4
-0  | 9  | CONST_INTEGER            | 5                        | 5

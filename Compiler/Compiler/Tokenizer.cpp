@@ -18,15 +18,16 @@ std::map<std::string, Token> operators = {
 };
 
 std::map<std::string, Token> separators = {
-	{ "[",  SEP_BRACKETS_SQUARE_LEFT },
-	{ "]",  SEP_BRACKETS_SQUARE_RIGHT },
-	{ "(",  SEP_BRACKETS_LEFT },
-	{ ")",  SEP_BRACKETS_RIGHT },
-	{ "{",  SEP_BRACKETS_FIGURE_LEFT },
-	{ "}",  SEP_BRACKETS_FIGURE_RIGHT },
+	{ "(",  SEP_BRACKET_LEFT },
+	{ ")",  SEP_BRACKET_RIGHT },
+	{ "[",  SEP_BRACKET_SQUARE_LEFT },
+	{ "]",  SEP_BRACKET_SQUARE_RIGHT },
+	{ "{",  SEP_BRACKET_FIGURE_LEFT },
+	{ "}",  SEP_BRACKET_FIGURE_RIGHT },
+	{ ";",  SEP_SEMICOLON },
 	{ ",",  SEP_COMMA },
 	{ ".",  SEP_DOT },
-	{ ";",  SEP_SEMICOLON },
+	{ "..", SEP_DOUBLE_DOT},
 };
 
 std::map<std::string, Token> keywords = {
@@ -128,6 +129,10 @@ bool Tokenizer::next()
 		tokenIsNumber = true;
 	}
 	else if (isspace(c)) {
+		next();
+	}
+
+	if (token == UNDEFINED) {
 		next();
 	}
 
@@ -266,8 +271,6 @@ void Tokenizer::parseNumber(char c)
 	}
 }
 
-
-
 void Tokenizer::parseWord(char c)
 {
 	tokenRow = reader.getRow();
@@ -323,7 +326,67 @@ void Tokenizer::parseWord(char c)
 
 void Tokenizer::parseSeparator(char c)
 {
+	tokenRow = reader.getRow();
+	tokenCol = reader.getCol();
 
+	tokenText = c;
+	if (c == '.') {
+		if (reader.endOfLine()) {
+			token = separators["."];
+		}
+		else {
+			c = reader.nextSymbol();
+			// double dot '..'
+			if (c == '.') {
+				token = separators[".."];
+				tokenText = "..";
+			}
+			else {
+				reader.symbolRollback();
+				token = separators["."];
+			}
+		}
+	}
+	// comment using symbols '{' and '}'
+	else if (c == '{') {
+		while (c != '}') {
+			if (reader.endOfFile()) {
+				throwLexicalException(tokenRow, tokenCol, "Unclosed comment");
+			}
+			c = reader.nextSymbol();
+		}
+	}
+	else if (c == '(') {
+		// not a comment
+		if (reader.endOfLine()) {
+			token = separators["("];
+		}
+		else if (reader.nextSymbol() != '*') {
+			token = separators["("];
+			reader.symbolRollback();
+		}
+		// comment using symbols '(*' and '*)'
+		else {
+			while (c != ')') {
+				c = reader.nextSymbol();
+				if (reader.endOfFile()) {
+					throwLexicalException(tokenRow, tokenCol, "Unclosed comment");
+				}
+				if (c == '*') {
+					if (reader.nextSymbol() == ')') {
+						break;
+					}
+					else {
+						// in case of '(***)'
+						reader.symbolRollback();
+					}
+				}
+			}
+		}
+	}
+	else {
+		token = separators[std::string({ c })];
+	}
 }
 
 void Tokenizer::parseOperator(char c)

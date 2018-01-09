@@ -288,4 +288,4 @@ __pycache__/
 *.xsd.cs
 
 # Temporary files
-/Compiler/Compiler/output.txt
+Compiler/Compiler/*.txt
