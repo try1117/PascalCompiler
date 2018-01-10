@@ -1,5 +1,5 @@
-0  | 0  | KEYWORD_VAR              | var                      | 
-1  | 0  | KEYWORD_VAR              | Var                      | 
-2  | 0  | KEYWORD_VAR              | VAr                      | 
-3  | 0  | KEYWORD_VAR              | VAR                      | 
-4  | 0  | KEYWORD_VAR              | vAr                      | 
+1  | 1  | KEYWORD_VAR              | var                      | 
+2  | 1  | KEYWORD_VAR              | Var                      | 
+3  | 1  | KEYWORD_VAR              | VAr                      | 
+4  | 1  | KEYWORD_VAR              | VAR                      | 
+5  | 1  | KEYWORD_VAR              | vAr                      | 

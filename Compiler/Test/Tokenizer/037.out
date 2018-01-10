@@ -1,0 +1,8 @@
+1  | 1  | VARIABLE                 | a                        | 
+1  | 3  | OP_EQUAL                 | :=                       | 
+1  | 6  | CONST_INTEGER            | 2                        | 2
+1  | 8  | OP_MULT                  | *                        | 
+1  | 10 | VARIABLE                 | b                        | 
+1  | 12 | OP_PLUS                  | +                        | 
+1  | 14 | VARIABLE                 | c                        | 
+1  | 15 | SEP_SEMICOLON            | ;                        | 

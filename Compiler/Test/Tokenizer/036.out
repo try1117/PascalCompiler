@@ -1,0 +1,4 @@
+1  | 1  | OP_EQUAL                 | :=                       | 
+2  | 1  | OP_LESS_OR_EQUAL         | <=                       | 
+3  | 1  | OP_GREATER_OR_EQUAL      | >=                       | 
+4  | 1  | OP_NOT_EQUAL             | <>                       | 

@@ -13,6 +13,7 @@ public:
 	FileReader(std::string fileName);
 	char nextSymbol();
 	void symbolRollback();
+	void nextLine();
 	bool endOfLine();
 	bool endOfFile();
 

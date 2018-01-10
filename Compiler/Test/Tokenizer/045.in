@@ -1,0 +1,8 @@
+var
+  a:integer = $fff;
+  b:double = -0.028e+7;
+begin
+  //if a = 2 * b
+  if a = b then
+    write(3 * a);
+end.

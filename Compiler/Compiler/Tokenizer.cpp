@@ -27,7 +27,6 @@ std::map<std::string, Token> separators = {
 	{ ";",  SEP_SEMICOLON },
 	{ ",",  SEP_COMMA },
 	{ ".",  SEP_DOT },
-	{ "..", SEP_DOUBLE_DOT},
 };
 
 std::map<std::string, Token> keywords = {
@@ -85,6 +84,16 @@ std::map<std::string, Token> keywords = {
 	{ "readln",    KEYWORD_READLN },
 };
 
+LexicalException::LexicalException(int row, int col, std::string mes)
+{
+	sprintf(message, "Lexical exception in row : %d column : %d - %s", row, col, mes.c_str());
+}
+
+const char * LexicalException::what() const
+{
+	return message;
+}
+
 Tokenizer::Tokenizer(std::string fileName) :
 	reader(fileName), token(UNDEFINED)
 {
@@ -100,40 +109,27 @@ bool wordSymbol(char c)
 	return (isalpha(c) || isdigit(c) || c == '_');
 }
 
-void throwLexicalException(int row, int col, std::string message)
-{
-	char cMes[200];
-	sprintf(cMes, "Lexical exception in row : %d column : %d - %s", row, col, message.c_str());
-	throw std::exception(cMes);
-}
-
 bool Tokenizer::next()
 {
 	token = UNDEFINED;
-	tokenIsNumber = false;
-	char c = reader.nextSymbol();
-	if (c == 0)
-		return false;
+	while (token == UNDEFINED) {
+		tokenValue = "";
+		char c = reader.nextSymbol();
+		if (c == 0)
+			return false;
 
-	if (wordFirstSymbol(c)) {
-		parseWord(c);
-	}
-	else if (separators.count(std::string({ c }))) {
-		parseSeparator(c);
-	}
-	else if (operators.count(std::string({ c }))) {
-		parseOperator(c);
-	}
-	else if (isdigit(c)) {
-		parseNumber(c);
-		tokenIsNumber = true;
-	}
-	else if (isspace(c)) {
-		next();
-	}
-
-	if (token == UNDEFINED) {
-		next();
+		if (wordFirstSymbol(c)) {
+			parseWord(c);
+		}
+		else if (separators.count(std::string({ c }))) {
+			parseSeparator(c);
+		}
+		else if (operators.count(std::string({ c }))) {
+			parseOperator(c);
+		}
+		else if (isdigit(c)) {
+			parseNumber(c);
+		}
 	}
 
 	return true;
@@ -156,18 +152,8 @@ std::string Tokenizer::toString()
 		stringPadding(3, srow) + "| " +
 		stringPadding(3, scol) + "| " +
 		stringPadding(25, TokenName[token]) + "| " +
-		stringPadding(25, tokenText) + "| ";
-
-	if (tokenIsNumber) {
-		if (token == CONST_INTEGER) {
-			res += tokenText;
-		}
-		else {
-			char number[40];
-			sprintf(number, "%.15lf", atof(tokenText.c_str()));
-			res += number;
-		}
-	}
+		stringPadding(25, tokenText) + "| " +
+		tokenValue;
 
 	return res;
 }
@@ -180,6 +166,29 @@ enum NumberState {
 	NS_AFTER_SIGN,
 	NS_COMPLETE,
 };
+
+std::string Tokenizer::transformNumber(Token token, std::string text)
+{
+	try {
+		if (token == CONST_HEX) {
+			return std::to_string(std::stoll(text, 0, 16));
+		}
+		else if (token == CONST_INTEGER) {
+			return std::to_string(std::stoll(text, 0, 10));
+		}
+		else {
+			char number[40];
+			sprintf(number, "%.15lf", std::stod(text));
+			return number;
+		}
+	}
+	catch (std::out_of_range e) {
+		throw LexicalException(tokenRow, tokenCol, "Number is too big");
+	}
+	catch (std::exception e) {
+		throw LexicalException(tokenRow, tokenCol, e.what());
+	}
+}
 
 void Tokenizer::parseNumber(char c)
 {
@@ -237,9 +246,7 @@ void Tokenizer::parseNumber(char c)
 				state = NS_AFTER_SIGN;
 			}
 			else {
-				char message[200];
-				sprintf(message, "Lexical exception in row : %d column : %d - Number ending at exp", reader.getRow(), reader.getCol());
-				throw std::exception(message);
+				throw LexicalException(reader.getRow(), reader.getCol(), "Number can't end at exp");
 			}
 		}
 		else if (state == NS_AFTER_SIGN) {
@@ -269,6 +276,8 @@ void Tokenizer::parseNumber(char c)
 	else {
 		token = CONST_DOUBLE;
 	}
+
+	tokenValue = transformNumber(token, tokenText);
 }
 
 void Tokenizer::parseWord(char c)
@@ -280,7 +289,7 @@ void Tokenizer::parseWord(char c)
 	if (c == '\'') {
 		while (true) {
 			if (reader.endOfLine()) {
-				throwLexicalException(tokenRow, tokenCol, "Missing terminating ' character");
+				throw LexicalException(tokenRow, tokenCol, "Missing terminating ' character");
 				return;
 			}
 
@@ -338,7 +347,7 @@ void Tokenizer::parseSeparator(char c)
 			c = reader.nextSymbol();
 			// double dot '..'
 			if (c == '.') {
-				token = separators[".."];
+				token = SEP_DOUBLE_DOT;
 				tokenText = "..";
 			}
 			else {
@@ -351,7 +360,7 @@ void Tokenizer::parseSeparator(char c)
 	else if (c == '{') {
 		while (c != '}') {
 			if (reader.endOfFile()) {
-				throwLexicalException(tokenRow, tokenCol, "Unclosed comment");
+				throw LexicalException(tokenRow, tokenCol, "Unclosed comment");
 			}
 			c = reader.nextSymbol();
 		}
@@ -370,7 +379,7 @@ void Tokenizer::parseSeparator(char c)
 			while (c != ')') {
 				c = reader.nextSymbol();
 				if (reader.endOfFile()) {
-					throwLexicalException(tokenRow, tokenCol, "Unclosed comment");
+					throw LexicalException(tokenRow, tokenCol, "Unclosed comment");
 				}
 				if (c == '*') {
 					if (reader.nextSymbol() == ')') {
@@ -391,5 +400,84 @@ void Tokenizer::parseSeparator(char c)
 
 void Tokenizer::parseOperator(char c)
 {
+	tokenRow = reader.getRow();
+	tokenCol = reader.getCol();
 
+	tokenText = c;
+	if (reader.endOfLine()) {
+		token = operators[std::string({ c })];
+		return;
+	}
+
+	char nxt = reader.nextSymbol();
+	if (c == ':') {
+		if (nxt == '=') {
+			token = OP_EQUAL;
+			tokenText.push_back(nxt);
+		}
+		else {
+			token = OP_COLON;
+			reader.symbolRollback();
+		}
+	}
+	else if (c == '<') {
+		if (nxt == '>') {
+			token = OP_NOT_EQUAL;
+			tokenText.push_back(nxt);
+		}
+		else if (nxt == '=') {
+			token = OP_LESS_OR_EQUAL;
+			tokenText.push_back(nxt);
+		}
+		else {
+			token = OP_LESS;
+			reader.symbolRollback();
+		}
+	}
+	else if (c == '>') {
+		if (nxt == '=') {
+			token = OP_GREATER_OR_EQUAL;
+			tokenText.push_back(nxt);
+		}
+		else {
+			token = OP_GREATER;
+			reader.symbolRollback();
+		}
+	}
+	else if (c == '/') {
+		if (nxt == '/') {
+			reader.nextLine();
+		}
+		else {
+			token = OP_DIVISION;
+			reader.symbolRollback();
+		}
+	}
+	// hex number
+	else if (c == '$') {
+		c = nxt;
+		tokenText = "";
+
+		if (!isalnum(nxt)) {
+			throw LexicalException(tokenRow, tokenCol, "Hex number excepted");
+		}
+
+		while (isalnum(c)) {
+			tokenText.push_back(c);
+			if (reader.endOfLine()) {
+				break;
+			}
+			c = reader.nextSymbol();
+			if (!isalnum(c)) {
+				reader.symbolRollback();
+				break;
+			}
+		}
+		token = CONST_HEX;
+		tokenValue = transformNumber(token, tokenText);
+	}
+	else {
+		token = operators[std::string({ c })];
+		reader.symbolRollback();
+	}
 }

@@ -1,4 +1,4 @@
-0  | 0  | KEYWORD_INTEGER          | Integer                  | 
-1  | 1  | KEYWORD_CHARACTER        | cHar                     | 
-2  | 2  | KEYWORD_DOUBLE           | doUble                   | 
-3  | 3  | KEYWORD_STRING           | strIng                   | 
+1  | 1  | KEYWORD_INTEGER          | Integer                  | 
+2  | 2  | KEYWORD_CHARACTER        | cHar                     | 
+3  | 3  | KEYWORD_DOUBLE           | doUble                   | 
+4  | 4  | KEYWORD_STRING           | strIng                   | 

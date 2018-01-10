@@ -1,8 +1,8 @@
-0  | 0  | CONST_INTEGER            | 1                        | 1
-0  | 2  | CONST_INTEGER            | 2                        | 2
-1  | 0  | CONST_INTEGER            | 3                        | 3
-1  | 2  | CONST_INTEGER            | 4                        | 4
-2  | 3  | CONST_INTEGER            | 5                        | 5
-2  | 5  | CONST_INTEGER            | 6                        | 6
-3  | 3  | CONST_INTEGER            | 7                        | 7
-3  | 5  | CONST_INTEGER            | 8                        | 8
+1  | 1  | CONST_INTEGER            | 1                        | 1
+1  | 3  | CONST_INTEGER            | 2                        | 2
+2  | 1  | CONST_INTEGER            | 3                        | 3
+2  | 3  | CONST_INTEGER            | 4                        | 4
+3  | 4  | CONST_INTEGER            | 5                        | 5
+3  | 6  | CONST_INTEGER            | 6                        | 6
+4  | 4  | CONST_INTEGER            | 7                        | 7
+4  | 6  | CONST_INTEGER            | 8                        | 8

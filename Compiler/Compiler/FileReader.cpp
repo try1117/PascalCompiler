@@ -2,24 +2,25 @@
 #include "FileReader.h"
 
 FileReader::FileReader(std::string fileName)
-	: input(fileName), row(-1), col(0)
+	: input(fileName), row(0), col(0)
 {
 }
 
 char FileReader::nextSymbol()
 {
-	if (col + 1 >= curLine.length()) {
+	if (col + 1 > curLine.length()) {
 		do {
 			if (!std::getline(input, curLine)) {
+				col = curLine.length();
 				return 0;
 			}
 			++row;
 		} while (curLine.empty());
 
-		col = -1;
+		col = 0;
 	}
 
-	return curLine[++col];
+	return curLine[col++];
 }
 
 void FileReader::symbolRollback()
@@ -27,9 +28,14 @@ void FileReader::symbolRollback()
 	assert(col--);
 }
 
+void FileReader::nextLine()
+{
+	col = curLine.length();
+}
+
 bool FileReader::endOfLine()
 {
-	return col + 1 == curLine.length();
+	return col == curLine.length();
 }
 
 bool FileReader::endOfFile()

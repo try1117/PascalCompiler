@@ -1,0 +1,6 @@
+1  | 1  | CONST_HEX                | a                        | 10
+2  | 1  | CONST_HEX                | A                        | 10
+3  | 1  | CONST_HEX                | 10                       | 16
+3  | 5  | CONST_HEX                | 11                       | 17
+3  | 9  | CONST_HEX                | 12                       | 18
+3  | 13 | CONST_HEX                | ff                       | 255

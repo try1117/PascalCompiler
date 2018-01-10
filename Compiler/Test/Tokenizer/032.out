@@ -1,8 +1,8 @@
-0  | 0  | SEP_BRACKET_LEFT         | (                        | 
-1  | 0  | SEP_BRACKET_RIGHT        | )                        | 
-2  | 0  | SEP_BRACKET_SQUARE_LEFT  | [                        | 
-3  | 0  | SEP_BRACKET_SQUARE_RIGHT | ]                        | 
-6  | 0  | SEP_SEMICOLON            | ;                        | 
-7  | 0  | SEP_COMMA                | ,                        | 
-8  | 0  | SEP_DOT                  | .                        | 
-9  | 0  | SEP_DOUBLE_DOT           | ..                       | 
+1  | 1  | SEP_BRACKET_LEFT         | (                        | 
+2  | 1  | SEP_BRACKET_RIGHT        | )                        | 
+3  | 1  | SEP_BRACKET_SQUARE_LEFT  | [                        | 
+4  | 1  | SEP_BRACKET_SQUARE_RIGHT | ]                        | 
+7  | 1  | SEP_SEMICOLON            | ;                        | 
+8  | 1  | SEP_COMMA                | ,                        | 
+9  | 1  | SEP_DOT                  | .                        | 
+10 | 1  | SEP_DOUBLE_DOT           | ..                       | 

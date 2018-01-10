@@ -1,2 +1,3 @@
-0  | 0  | KEYWORD_BEGIN            | begin                    | 
-2  | 19 | SEP_BRACKET_RIGHT        | )                        | 
+1  | 1  | KEYWORD_BEGIN            | begin                    | 
+3  | 19 | OP_MULT                  | *                        | 
+3  | 20 | SEP_BRACKET_RIGHT        | )                        | 

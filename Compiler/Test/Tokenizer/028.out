@@ -1,6 +1,6 @@
-0  | 0  | KEYWORD_BEGIN            | begin                    | 
-4  | 2  | KEYWORD_VAR              | var                      | 
-4  | 6  | VARIABLE                 | abs                      | 
-4  | 10 | CONST_STRING             | qwerty                   | 
-5  | 0  | KEYWORD_END              | end                      | 
-5  | 3  | SEP_DOT                  | .                        | 
+1  | 1  | KEYWORD_BEGIN            | begin                    | 
+5  | 3  | KEYWORD_VAR              | var                      | 
+5  | 7  | VARIABLE                 | abs                      | 
+5  | 11 | CONST_STRING             | qwerty                   | 
+6  | 1  | KEYWORD_END              | end                      | 
+6  | 4  | SEP_DOT                  | .                        | 

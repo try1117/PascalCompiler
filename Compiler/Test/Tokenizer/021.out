@@ -1,5 +1,5 @@
-0  | 0  | CONST_STRING             | 123qwer'ty               | 
-0  | 13 | VARIABLE                 | another                  | 
-0  | 20 | CONST_STRING             |                          | 
-1  | 0  | KEYWORD_BEGIN            | begin                    | 
-1  | 6  | KEYWORD_END              | end                      | 
+1  | 1  | CONST_STRING             | 123qwer'ty               | 
+1  | 14 | VARIABLE                 | another                  | 
+1  | 21 | CONST_STRING             |                          | 
+2  | 1  | KEYWORD_BEGIN            | begin                    | 
+2  | 7  | KEYWORD_END              | end                      | 
