@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Tokenizer.h"
+#include "Exceptions.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,8 +19,8 @@ int main(int argc, char *argv[])
 
 			try {
 				while (tokenizer.next()) {
-					//std::cout << tokenizer.toString() << std::endl;
-					output << tokenizer.toString() << std::endl;
+					//std::cout << tokenizer.getCurrentToken()->toString() << std::endl;
+					output << tokenizer.getCurrentToken()->toString() << std::endl;
 				}
 			}
 			catch (LexicalException e) {

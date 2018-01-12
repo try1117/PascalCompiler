@@ -1,4 +1,3 @@
-#include <cassert>
 #include "FileReader.h"
 
 FileReader::FileReader(std::string fileName)
@@ -25,7 +24,9 @@ char FileReader::nextSymbol()
 
 void FileReader::symbolRollback()
 {
-	assert(col--);
+	if (--col == 0) {
+		throw std::exception("FileReader can't rollback the very first symbol of the line");
+	}
 }
 
 void FileReader::nextLine()

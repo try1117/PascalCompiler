@@ -1,4 +1,58 @@
+#include <algorithm>
 #include "Token.h"
+#include "Exceptions.h"
+
+Token::Token(TokenType type, int row, int col, std::string text)
+	: type(type), row(row), col(col), text(text), value(textToValue(type, text))
+{
+}
+
+std::string stringPadding(int len, std::string s) {
+	return s + std::string(std::max<int>(0, len - s.length()), ' ');
+}
+
+std::string Token::toString()
+{
+	std::string res =
+		stringPadding(3, std::to_string(row)) + "| " +
+		stringPadding(3, std::to_string(col)) + "| " +
+		stringPadding(25, TokenName[type]) + "| " +
+		stringPadding(25, text) + "| " +
+		value;
+
+	return res;
+}
+
+void Token::assignValue()
+{
+	value = textToValue(type, text);
+}
+
+std::string Token::textToValue(TokenType type, std::string text)
+{
+	try {
+		if (type == CONST_HEX) {
+			return std::to_string(std::stoll(text, 0, 16));
+		}
+		else if (type == CONST_INTEGER) {
+			return std::to_string(std::stoll(text, 0, 10));
+		}
+		else if (type == CONST_DOUBLE) {
+			char number[40];
+			sprintf(number, "%.15lf", std::stod(text));
+			return number;
+		}
+		else {
+			return "";
+		}
+	}
+	catch (std::out_of_range e) {
+		throw LexicalException(row, col, "Number is too big");
+	}
+	catch (std::exception e) {
+		throw LexicalException(row, col, e.what());
+	}
+}
 
 std::string TokenName[] = {
 	"UNDEFINED",
@@ -9,7 +63,7 @@ std::string TokenName[] = {
 	"CONST_CHARACTER",
 	"CONST_HEX",
 	"CONST_STRING",
-	
+
 	// Keywords
 	"KEYWORD_INTEGER",
 	"KEYWORD_DOUBLE",
@@ -64,7 +118,7 @@ std::string TokenName[] = {
 	"KEYWORD_READLN",
 	"KEYWORD_EOF",
 	"VARIABLE",
-	
+
 	// Separators
 	"SEP_BRACKET_LEFT",
 	"SEP_BRACKET_RIGHT",
@@ -76,7 +130,7 @@ std::string TokenName[] = {
 	"SEP_COMMA",
 	"SEP_DOT",
 	"SEP_DOUBLE_DOT",
-	
+
 	// Operators
 	"OP_MINUS",
 	"OP_PLUS",

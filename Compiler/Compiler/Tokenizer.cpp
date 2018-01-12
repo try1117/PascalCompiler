@@ -1,8 +1,10 @@
 #include <map>
 #include <algorithm>
-#include "Tokenizer.h"
 
-std::map<std::string, Token> operators = {
+#include "Tokenizer.h"
+#include "Exceptions.h"
+
+std::map<std::string, TokenType> operators = {
 	{ "+", OP_PLUS },
 	{ "-", OP_MINUS },
 	{ "*", OP_MULT },
@@ -17,7 +19,7 @@ std::map<std::string, Token> operators = {
 	{ ":", OP_COLON },
 };
 
-std::map<std::string, Token> separators = {
+std::map<std::string, TokenType> separators = {
 	{ "(",  SEP_BRACKET_LEFT },
 	{ ")",  SEP_BRACKET_RIGHT },
 	{ "[",  SEP_BRACKET_SQUARE_LEFT },
@@ -29,7 +31,7 @@ std::map<std::string, Token> separators = {
 	{ ".",  SEP_DOT },
 };
 
-std::map<std::string, Token> keywords = {
+std::map<std::string, TokenType> keywords = {
 	{ "integer",   KEYWORD_INTEGER },
 	{ "double",    KEYWORD_DOUBLE },
 	{ "char",      KEYWORD_CHARACTER },
@@ -84,18 +86,8 @@ std::map<std::string, Token> keywords = {
 	{ "readln",    KEYWORD_READLN },
 };
 
-LexicalException::LexicalException(int row, int col, std::string mes)
-{
-	sprintf(message, "Lexical exception in row : %d column : %d - %s", row, col, mes.c_str());
-}
-
-const char * LexicalException::what() const
-{
-	return message;
-}
-
 Tokenizer::Tokenizer(std::string fileName) :
-	reader(fileName), token(UNDEFINED)
+	reader(fileName), token(nullptr)
 {
 }
 
@@ -111,12 +103,15 @@ bool wordSymbol(char c)
 
 bool Tokenizer::next()
 {
-	token = UNDEFINED;
-	while (token == UNDEFINED) {
-		tokenValue = "";
+	token = std::make_shared<Token>(UNDEFINED, reader.getRow(), reader.getCol());
+	while (token->type == UNDEFINED) {
 		char c = reader.nextSymbol();
 		if (c == 0)
 			return false;
+
+		token->row = reader.getRow();
+		token->col = reader.getCol();
+		token->text = "";
 
 		if (wordFirstSymbol(c)) {
 			parseWord(c);
@@ -135,27 +130,16 @@ bool Tokenizer::next()
 	return true;
 }
 
-Token Tokenizer::getCurrentToken()
+std::shared_ptr<Token> Tokenizer::getCurrentToken()
 {
 	return token;
 }
 
-std::string stringPadding(int len, std::string s) {
-	return s + std::string(std::max<int>(0, len - s.length()), ' ');
-}
-
-std::string Tokenizer::toString()
+std::shared_ptr<Token> Tokenizer::getNextToken()
 {
-	std::string srow = std::to_string(tokenRow);
-	std::string scol = std::to_string(tokenCol);
-	std::string res =
-		stringPadding(3, srow) + "| " +
-		stringPadding(3, scol) + "| " +
-		stringPadding(25, TokenName[token]) + "| " +
-		stringPadding(25, tokenText) + "| " +
-		tokenValue;
-
-	return res;
+	if (next())
+		return getCurrentToken();
+	return nullptr;
 }
 
 enum NumberState {
@@ -167,35 +151,9 @@ enum NumberState {
 	NS_COMPLETE,
 };
 
-std::string Tokenizer::transformNumber(Token token, std::string text)
-{
-	try {
-		if (token == CONST_HEX) {
-			return std::to_string(std::stoll(text, 0, 16));
-		}
-		else if (token == CONST_INTEGER) {
-			return std::to_string(std::stoll(text, 0, 10));
-		}
-		else {
-			char number[40];
-			sprintf(number, "%.15lf", std::stod(text));
-			return number;
-		}
-	}
-	catch (std::out_of_range e) {
-		throw LexicalException(tokenRow, tokenCol, "Number is too big");
-	}
-	catch (std::exception e) {
-		throw LexicalException(tokenRow, tokenCol, e.what());
-	}
-}
-
 void Tokenizer::parseNumber(char c)
 {
-	tokenRow = reader.getRow();
-	tokenCol = reader.getCol();
-
-	tokenText = c;
+	token->text = c;
 	NumberState state = NS_INITIAL;
 	bool isInteger = true;
 	
@@ -206,16 +164,16 @@ void Tokenizer::parseNumber(char c)
 		else if (state == NS_BEFORE_DOT) {
 			if (c == '.') {
 				state = NS_BEFORE_EXP;
-				tokenText.push_back(c);
+				token->text += c;
 				isInteger = false;
 			}
 			else if (c == 'e' || c == 'E') {
 				state = NS_BEFORE_SIGN;
-				tokenText.push_back(c);
+				token->text += c;
 				isInteger = false;
 			}
 			else if (isdigit(c)) {
-				tokenText.push_back(c);
+				token->text += c;
 			}
 			else {
 				state = NS_COMPLETE;
@@ -224,14 +182,14 @@ void Tokenizer::parseNumber(char c)
 		else if (state == NS_BEFORE_EXP) {
 			if (c == 'e' || c == 'E') {
 				state = NS_BEFORE_SIGN;
-				tokenText.push_back(c);
+				token->text += c;
 			}
 			else if (isdigit(c)) {
-				tokenText.push_back(c);
+				token->text += c;
 			}
 			// double dot ".." case
 			else if (c == '.') {
-				tokenText.pop_back();
+				token->text.pop_back();
 				reader.symbolRollback();
 				state = NS_BEFORE_DOT;
 				break;
@@ -242,7 +200,7 @@ void Tokenizer::parseNumber(char c)
 		}
 		else if (state == NS_BEFORE_SIGN) {
 			if (c == '+' || c == '-' || isdigit(c)) {
-				tokenText.push_back(c);
+				token->text += c;
 				state = NS_AFTER_SIGN;
 			}
 			else {
@@ -251,7 +209,7 @@ void Tokenizer::parseNumber(char c)
 		}
 		else if (state == NS_AFTER_SIGN) {
 			if (isdigit(c)) {
-				tokenText.push_back(c);
+				token->text += c;
 			}
 			else {
 				state = NS_COMPLETE;
@@ -271,25 +229,22 @@ void Tokenizer::parseNumber(char c)
 	}
 
 	if (isInteger) {
-		token = CONST_INTEGER;
+		token->type = CONST_INTEGER;
 	}
 	else {
-		token = CONST_DOUBLE;
+		token->type = CONST_DOUBLE;
 	}
 
-	tokenValue = transformNumber(token, tokenText);
+	token->assignValue();
 }
 
 void Tokenizer::parseWord(char c)
 {
-	tokenRow = reader.getRow();
-	tokenCol = reader.getCol();
-
-	tokenText = "";
+	token->text = "";
 	if (c == '\'') {
 		while (true) {
 			if (reader.endOfLine()) {
-				throw LexicalException(tokenRow, tokenCol, "Missing terminating ' character");
+				throw LexicalException(token->row, token->col, "Missing terminating ' character");
 				return;
 			}
 
@@ -304,14 +259,14 @@ void Tokenizer::parseWord(char c)
 				reader.symbolRollback();
 				break;
 			}
-			tokenText.push_back(c);
+			token->text += c;
 		}
-		token = CONST_STRING;
+		token->type = CONST_STRING;
 		return;
 	}
 	
 	while (true) {
-		tokenText.push_back(c);
+		token->text += c;
 		if (reader.endOfLine()) {
 			break;
 		}
@@ -322,37 +277,34 @@ void Tokenizer::parseWord(char c)
 		}
 	}
 	
-	std::string low = tokenText;
+	std::string low = token->text;
 	std::transform(low.begin(), low.end(), low.begin(), ::tolower);
 
 	if (keywords.count(low)) {
-		token = keywords[low];
+		token->type = keywords[low];
 	}
 	else {
-		token = VARIABLE;
+		token->type = VARIABLE;
 	}
 }
 
 void Tokenizer::parseSeparator(char c)
 {
-	tokenRow = reader.getRow();
-	tokenCol = reader.getCol();
-
-	tokenText = c;
+	token->text = c;
 	if (c == '.') {
 		if (reader.endOfLine()) {
-			token = separators["."];
+			token->type = separators["."];
 		}
 		else {
 			c = reader.nextSymbol();
 			// double dot '..'
 			if (c == '.') {
-				token = SEP_DOUBLE_DOT;
-				tokenText = "..";
+				token->type = SEP_DOUBLE_DOT;
+				token->text = "..";
 			}
 			else {
 				reader.symbolRollback();
-				token = separators["."];
+				token->type = SEP_DOT;
 			}
 		}
 	}
@@ -360,7 +312,7 @@ void Tokenizer::parseSeparator(char c)
 	else if (c == '{') {
 		while (c != '}') {
 			if (reader.endOfFile()) {
-				throw LexicalException(tokenRow, tokenCol, "Unclosed comment");
+				throw LexicalException(token->row, token->col, "Unclosed comment");
 			}
 			c = reader.nextSymbol();
 		}
@@ -368,10 +320,10 @@ void Tokenizer::parseSeparator(char c)
 	else if (c == '(') {
 		// not a comment
 		if (reader.endOfLine()) {
-			token = separators["("];
+			token->type = SEP_BRACKET_LEFT;
 		}
 		else if (reader.nextSymbol() != '*') {
-			token = separators["("];
+			token->type = SEP_BRACKET_LEFT;
 			reader.symbolRollback();
 		}
 		// comment using symbols '(*' and '*)'
@@ -379,7 +331,7 @@ void Tokenizer::parseSeparator(char c)
 			while (c != ')') {
 				c = reader.nextSymbol();
 				if (reader.endOfFile()) {
-					throw LexicalException(tokenRow, tokenCol, "Unclosed comment");
+					throw LexicalException(token->row, token->col, "Unclosed comment");
 				}
 				if (c == '*') {
 					if (reader.nextSymbol() == ')') {
@@ -394,53 +346,50 @@ void Tokenizer::parseSeparator(char c)
 		}
 	}
 	else {
-		token = separators[std::string({ c })];
+		token->type = separators[std::string({ c })];
 	}
 }
 
 void Tokenizer::parseOperator(char c)
 {
-	tokenRow = reader.getRow();
-	tokenCol = reader.getCol();
-
-	tokenText = c;
+	token->text = c;
 	if (reader.endOfLine()) {
-		token = operators[std::string({ c })];
+		token->type = operators[std::string({ c })];
 		return;
 	}
 
 	char nxt = reader.nextSymbol();
 	if (c == ':') {
 		if (nxt == '=') {
-			token = OP_EQUAL;
-			tokenText.push_back(nxt);
+			token->type = OP_EQUAL;
+			token->text.push_back(nxt);
 		}
 		else {
-			token = OP_COLON;
+			token->type = OP_COLON;
 			reader.symbolRollback();
 		}
 	}
 	else if (c == '<') {
 		if (nxt == '>') {
-			token = OP_NOT_EQUAL;
-			tokenText.push_back(nxt);
+			token->type = OP_NOT_EQUAL;
+			token->text.push_back(nxt);
 		}
 		else if (nxt == '=') {
-			token = OP_LESS_OR_EQUAL;
-			tokenText.push_back(nxt);
+			token->type = OP_LESS_OR_EQUAL;
+			token->text.push_back(nxt);
 		}
 		else {
-			token = OP_LESS;
+			token->type = OP_LESS;
 			reader.symbolRollback();
 		}
 	}
 	else if (c == '>') {
 		if (nxt == '=') {
-			token = OP_GREATER_OR_EQUAL;
-			tokenText.push_back(nxt);
+			token->type = OP_GREATER_OR_EQUAL;
+			token->text.push_back(nxt);
 		}
 		else {
-			token = OP_GREATER;
+			token->type = OP_GREATER;
 			reader.symbolRollback();
 		}
 	}
@@ -449,21 +398,21 @@ void Tokenizer::parseOperator(char c)
 			reader.nextLine();
 		}
 		else {
-			token = OP_DIVISION;
+			token->type = OP_DIVISION;
 			reader.symbolRollback();
 		}
 	}
 	// hex number
 	else if (c == '$') {
 		c = nxt;
-		tokenText = "";
+		token->text = "";
 
 		if (!isalnum(nxt)) {
-			throw LexicalException(tokenRow, tokenCol, "Hex number excepted");
+			throw LexicalException(token->row, token->col, "Hex number expected");
 		}
 
 		while (isalnum(c)) {
-			tokenText.push_back(c);
+			token->text += c;
 			if (reader.endOfLine()) {
 				break;
 			}
@@ -473,11 +422,11 @@ void Tokenizer::parseOperator(char c)
 				break;
 			}
 		}
-		token = CONST_HEX;
-		tokenValue = transformNumber(token, tokenText);
+		token->type = CONST_HEX;
+		token->assignValue();
 	}
 	else {
-		token = operators[std::string({ c })];
+		token->type = operators[std::string({ c })];
 		reader.symbolRollback();
 	}
 }

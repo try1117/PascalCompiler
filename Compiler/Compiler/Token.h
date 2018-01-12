@@ -1,7 +1,25 @@
 #pragma once
 #include <map>
+#include <string>
 
-enum Token {
+enum TokenType;
+extern std::string TokenName[];
+
+struct Token {
+	TokenType type;
+	std::string text;
+	std::string value;
+	int row, col;
+
+	Token(TokenType type, int row, int col, std::string text = "");
+	std::string toString();
+	void assignValue();
+
+private:
+	std::string textToValue(TokenType type, std::string text);
+};
+
+enum TokenType {
 	UNDEFINED,
 
 	// Data type
@@ -93,5 +111,3 @@ enum Token {
 	OP_LESS_OR_EQUAL,
 	OP_GREATER_OR_EQUAL,
 };
-
-extern std::string TokenName[];
