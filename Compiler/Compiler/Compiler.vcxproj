@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="ExpressionParser.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Tokenizer.h" />

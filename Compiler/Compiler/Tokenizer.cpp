@@ -10,7 +10,6 @@ std::map<std::string, TokenType> operators = {
 	{ "*", OP_MULT },
 	{ "/", OP_DIVISION },
 	{ "@", OP_AT },
-	{ "#", OP_LATTICE },
 	{ "$", OP_DOLLAR },
 	{ "^", OP_CAP },
 	{ "=", OP_EQUAL },

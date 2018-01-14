@@ -4,11 +4,6 @@
 
 class FileReader
 {
-private:
-	int row, col;
-	std::ifstream input;
-	std::string curLine;
-
 public:
 	FileReader(std::string fileName);
 	char nextSymbol();
@@ -19,4 +14,9 @@ public:
 
 	int getRow();
 	int getCol();
+
+private:
+	int row, col;
+	std::ifstream input;
+	std::string curLine;
 };	

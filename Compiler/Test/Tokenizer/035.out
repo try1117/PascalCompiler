@@ -3,10 +3,9 @@
 3  | 1  | OP_MULT                  | *                        | 
 4  | 1  | OP_DIVISION              | /                        | 
 5  | 1  | OP_AT                    | @                        | 
-6  | 1  | OP_LATTICE               | #                        | 
-7  | 1  | OP_DOLLAR                | $                        | 
-8  | 1  | OP_CAP                   | ^                        | 
-9  | 1  | OP_EQUAL                 | =                        | 
-10 | 1  | OP_GREATER               | >                        | 
-11 | 1  | OP_LESS                  | <                        | 
-12 | 1  | OP_COLON                 | :                        | 
+6  | 1  | OP_DOLLAR                | $                        | 
+7  | 1  | OP_CAP                   | ^                        | 
+8  | 1  | OP_EQUAL                 | =                        | 
+9  | 1  | OP_GREATER               | >                        | 
+10 | 1  | OP_LESS                  | <                        | 
+11 | 1  | OP_COLON                 | :                        | 

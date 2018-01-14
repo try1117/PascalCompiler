@@ -12,7 +12,7 @@ for i in listdir('./'):
         a, b = f1.read(), f2.read();
         if a != b:
             print('Test "{}" failed'.format(i))
-            print(b, file=open('{}.out'.format(name.group('name')), 'w'), end='')
+            print(b, file=open('{}_failed.out'.format(name.group('name')), 'w'), end='')
         else:
             print('Test "{}" passed'.format(i))
         f1.close()

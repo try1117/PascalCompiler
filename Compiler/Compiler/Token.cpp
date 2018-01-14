@@ -112,8 +112,6 @@ std::string TokenName[] = {
 	"KEYWORD_UNRESERVED",
 	"KEYWORD_WRITE",
 	"KEYWORD_WRITELN",
-	"OP_LATTICE",
-	"OP_DOLLAR",
 	"KEYWORD_READ",
 	"KEYWORD_READLN",
 	"KEYWORD_EOF",
@@ -145,4 +143,5 @@ std::string TokenName[] = {
 	"OP_EQUAL",
 	"OP_LESS_OR_EQUAL",
 	"OP_GREATER_OR_EQUAL",
+	"OP_DOLLAR",
 };

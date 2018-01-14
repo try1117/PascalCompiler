@@ -44,5 +44,8 @@
     <ClInclude Include="Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ExpressionParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
