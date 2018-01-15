@@ -113,6 +113,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Exceptions.cpp" />
+    <ClCompile Include="ExpressionParser.cpp" />
+    <ClCompile Include="SyntaxObject.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Token.cpp" />
@@ -121,6 +123,7 @@
   <ItemGroup>
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="ExpressionParser.h" />
+    <ClInclude Include="SyntaxObject.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Tokenizer.h" />

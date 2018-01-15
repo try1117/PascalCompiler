@@ -9,11 +9,11 @@ char FileReader::nextSymbol()
 {
 	if (col + 1 > curLine.length()) {
 		do {
+			++row;
 			if (!std::getline(input, curLine)) {
 				col = curLine.length();
 				return 0;
 			}
-			++row;
 		} while (curLine.empty());
 
 		col = 0;

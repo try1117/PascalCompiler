@@ -102,15 +102,21 @@ bool wordSymbol(char c)
 
 bool Tokenizer::next()
 {
+	if (token != nullptr && token->type == KEYWORD_EOF) {
+		return false;
+	}
+
 	token = std::make_shared<Token>(UNDEFINED, reader.getRow(), reader.getCol());
 	while (token->type == UNDEFINED) {
 		char c = reader.nextSymbol();
-		if (c == 0)
-			return false;
-
 		token->row = reader.getRow();
 		token->col = reader.getCol();
 		token->text = "";
+		
+		if (c == 0) {
+			token->type = KEYWORD_EOF;
+			return false;
+		}
 
 		if (wordFirstSymbol(c)) {
 			parseWord(c);
@@ -131,14 +137,15 @@ bool Tokenizer::next()
 
 std::shared_ptr<Token> Tokenizer::getCurrentToken()
 {
+	if (token == nullptr)
+		next();
 	return token;
 }
 
 std::shared_ptr<Token> Tokenizer::getNextToken()
 {
-	if (next())
-		return getCurrentToken();
-	return nullptr;
+	next();
+	return getCurrentToken();
 }
 
 enum NumberState {
