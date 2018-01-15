@@ -56,17 +56,7 @@ std::shared_ptr<Expression> ExpressionParser::parseFactor()
 		return std::make_shared<ExprVar>(token);
 	}
 	else if (token->type == OP_MINUS || token->type == OP_PLUS) {
-		auto nextToken = tokenizer->getCurrentToken();
-		std::shared_ptr<Expression> nextExpr;
-
-		if (nextToken->type == SEP_BRACKET_LEFT) {
-			tokenizer->next();
-			nextExpr = parseExpr();
-		}
-		else {
-			nextExpr = parseFactor();
-		}
-		return std::make_shared<ExprUnaryOp>(token, nextExpr);
+		return std::make_shared<ExprUnaryOp>(token, parseFactor());
 	}
 	else {
 		throw SyntaxException(token->row, token->col, "Expected identifier, constant or expression");
