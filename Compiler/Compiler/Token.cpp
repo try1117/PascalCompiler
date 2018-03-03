@@ -2,8 +2,8 @@
 #include "Token.h"
 #include "Exceptions.h"
 
-Token::Token(TokenType type, int row, int col, std::string text)
-	: type(type), row(row), col(col), text(text), value(textToValue(type, text))
+Token::Token(TokenType type, int row, int col, std::string text, std::string value)
+	: type(type), row(row), col(col), text(text), value(value)
 {
 }
 
@@ -23,27 +23,22 @@ std::string Token::toString()
 	return res;
 }
 
-void Token::assignValue()
-{
-	value = textToValue(type, text);
-}
-
-std::string Token::textToValue(TokenType type, std::string text)
+void Token::assignValue(std::string text, int base)
 {
 	try {
-		if (type == CONST_HEX) {
-			return std::to_string(std::stoll(text, 0, 16));
-		}
-		else if (type == CONST_INTEGER) {
-			return std::to_string(std::stoll(text, 0, 10));
+		if (type == CONST_INTEGER) {
+			value = std::to_string(std::stoll(text, 0, base));
 		}
 		else if (type == CONST_DOUBLE) {
 			char number[40];
 			sprintf(number, "%.15lf", std::stod(text));
-			return number;
+			value = number;
+		}
+		else if (type == CONST_CHARACTER) {
+			value = char(std::stoi(text));
 		}
 		else {
-			return "";
+			value = "";
 		}
 	}
 	catch (std::out_of_range e) {
@@ -61,7 +56,6 @@ std::string TokenName[] = {
 	"CONST_INTEGER",
 	"CONST_DOUBLE",
 	"CONST_CHARACTER",
-	"CONST_HEX",
 	"CONST_STRING",
 
 	// Keywords

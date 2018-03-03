@@ -16,6 +16,7 @@ private:
 	FileReader reader;
 	std::shared_ptr<Token> token;
 
+	void parseSpecialNumber(char c);
 	void parseNumber(char c);
 	void parseWord(char c);
 	void parseOperator(char c);

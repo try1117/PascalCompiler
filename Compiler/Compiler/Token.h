@@ -6,17 +6,19 @@ enum TokenType;
 extern std::string TokenName[];
 
 struct Token {
+	enum ValueType {
+		INTEGER,
+		DOUBLE,
+	};
+
 	TokenType type;
 	std::string text;
 	std::string value;
 	int row, col;
 
-	Token(TokenType type, int row, int col, std::string text = "");
+	Token(TokenType type, int row, int col, std::string text = "", std::string value = "");
 	std::string toString();
-	void assignValue();
-
-private:
-	std::string textToValue(TokenType type, std::string text);
+	void assignValue(std::string text, int base);
 };
 
 enum TokenType {
@@ -26,7 +28,6 @@ enum TokenType {
 	CONST_INTEGER,
 	CONST_DOUBLE,
 	CONST_CHARACTER,
-	CONST_HEX,
 	CONST_STRING,
 
 	// Keywords
@@ -108,5 +109,4 @@ enum TokenType {
 	OP_EQUAL,
 	OP_LESS_OR_EQUAL,
 	OP_GREATER_OR_EQUAL,
-	OP_DOLLAR,
 };

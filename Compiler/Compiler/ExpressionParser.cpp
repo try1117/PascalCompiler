@@ -16,7 +16,7 @@ std::shared_ptr<Expression> ExpressionParser::parseExpr()
 	auto node = parseTerm();
 	auto token = tokenizer->getCurrentToken();
 
-	while (token->type != KEYWORD_EOF && isExpr(token)) {
+	while (isExpr(token)) {
 		tokenizer->next();
 		node = std::make_shared<ExprBinaryOp>(token, node, parseTerm());
 		token = tokenizer->getCurrentToken();
@@ -30,7 +30,7 @@ std::shared_ptr<Expression> ExpressionParser::parseTerm()
 	auto node = parseFactor();
 	auto token = tokenizer->getCurrentToken();
 
-	while (token->type != KEYWORD_EOF && isTerm(token)) {
+	while (isTerm(token)) {
 		tokenizer->next();
 		node = std::make_shared<ExprBinaryOp>(token, node, parseFactor());
 		token = tokenizer->getCurrentToken();
@@ -68,8 +68,7 @@ bool ExpressionParser::isVar(std::shared_ptr<Token> token)
 	return
 		token->type == VARIABLE ||
 		token->type == CONST_DOUBLE ||
-		token->type == CONST_INTEGER ||
-		token->type == CONST_HEX;
+		token->type == CONST_INTEGER;
 }
 
 bool ExpressionParser::isExpr(std::shared_ptr<Token> token)

@@ -1,5 +1,6 @@
 #include <map>
 #include <algorithm>
+#include <functional>
 
 #include "Tokenizer.h"
 #include "Exceptions.h"
@@ -10,7 +11,6 @@ std::map<std::string, TokenType> operators = {
 	{ "*", OP_MULT },
 	{ "/", OP_DIVISION },
 	{ "@", OP_AT },
-	{ "$", OP_DOLLAR },
 	{ "^", OP_CAP },
 	{ "=", OP_EQUAL },
 	{ ">", OP_GREATER },
@@ -100,6 +100,11 @@ bool wordSymbol(char c)
 	return (isalpha(c) || isdigit(c) || c == '_');
 }
 
+bool specialNumberSymbol(char c)
+{
+	return c == '$' || c == '%' || c == '#';
+}
+
 bool Tokenizer::next()
 {
 	if (token != nullptr && token->type == KEYWORD_EOF) {
@@ -126,6 +131,9 @@ bool Tokenizer::next()
 		}
 		else if (operators.count(std::string({ c }))) {
 			parseOperator(c);
+		}
+		else if (specialNumberSymbol(c)) {
+			parseSpecialNumber(c);
 		}
 		else if (isdigit(c)) {
 			parseNumber(c);
@@ -157,12 +165,64 @@ enum NumberState {
 	NS_COMPLETE,
 };
 
+void Tokenizer::parseSpecialNumber(char c)
+{
+	token->text = c;
+	NumberState state = NS_INITIAL;
+
+	token->type = (c == '#' ? CONST_CHARACTER : CONST_INTEGER);
+
+	std::map<char, std::function<bool(char)>> checkFunctions = {
+		std::make_pair('%', [](char c) { return c == '0' || c == '1'; }),
+		std::make_pair('$', [](char c) { return isalnum(c); }),
+		std::make_pair('#', [](char c) { return isdigit(c); }),
+	};
+
+	std::map<char, std::string> errorMessages = {
+		std::make_pair('%', "Binary number expected"),
+		std::make_pair('$', "Hex number expected"),
+		std::make_pair('#', "Decimal number from 0 to 255 expected"),
+	};
+
+	std::map<char, int> bases = {
+		std::make_pair('%', 2),
+		std::make_pair('$', 16),
+		std::make_pair('#', 10),
+	};
+	
+	std::function<bool(char)> check = checkFunctions[c];
+	std::string errorMessage = errorMessages[c];
+	int base = bases[c];
+
+	c = reader.nextSymbol();
+	if (!check(c)) {
+		throw LexicalException(token->row, token->col, errorMessage);
+	}
+
+	while (check(c)) {
+		token->text += c;
+		if (reader.endOfLine()) {
+			break;
+		}
+		c = reader.nextSymbol();
+		if (!isalnum(c)) {
+			reader.symbolRollback();
+			break;
+		}
+	}
+	token->assignValue(token->text.substr(1, token->text.length()), base);
+	
+	if (token->type == CONST_CHARACTER && !(0 <= std::stoi(token->value) && std::stoi(token->value) <= 255)) {
+		throw LexicalException(token->row, token->col, errorMessage);
+	}
+}
+
 void Tokenizer::parseNumber(char c)
 {
 	token->text = c;
 	NumberState state = NS_INITIAL;
-	bool isInteger = true;
-	
+	token->type = CONST_INTEGER;
+
 	while (state != NS_COMPLETE) {
 		if (state == NS_INITIAL) {
 			state = NS_BEFORE_DOT;
@@ -171,12 +231,12 @@ void Tokenizer::parseNumber(char c)
 			if (c == '.') {
 				state = NS_BEFORE_EXP;
 				token->text += c;
-				isInteger = false;
+				token->type = CONST_DOUBLE;
 			}
 			else if (c == 'e' || c == 'E') {
 				state = NS_BEFORE_SIGN;
 				token->text += c;
-				isInteger = false;
+				token->type = CONST_DOUBLE;
 			}
 			else if (isdigit(c)) {
 				token->text += c;
@@ -234,14 +294,7 @@ void Tokenizer::parseNumber(char c)
 		reader.symbolRollback();
 	}
 
-	if (isInteger) {
-		token->type = CONST_INTEGER;
-	}
-	else {
-		token->type = CONST_DOUBLE;
-	}
-
-	token->assignValue();
+	token->assignValue(token->text, 10);
 }
 
 void Tokenizer::parseWord(char c)
@@ -285,13 +338,7 @@ void Tokenizer::parseWord(char c)
 	
 	std::string low = token->text;
 	std::transform(low.begin(), low.end(), low.begin(), ::tolower);
-
-	if (keywords.count(low)) {
-		token->type = keywords[low];
-	}
-	else {
-		token->type = VARIABLE;
-	}
+	token->type = (keywords.count(low) ? keywords[low] : VARIABLE);
 }
 
 void Tokenizer::parseSeparator(char c)
@@ -407,29 +454,6 @@ void Tokenizer::parseOperator(char c)
 			token->type = OP_DIVISION;
 			reader.symbolRollback();
 		}
-	}
-	// hex number
-	else if (c == '$') {
-		c = nxt;
-		token->text = "";
-
-		if (!isalnum(nxt)) {
-			throw LexicalException(token->row, token->col, "Hex number expected");
-		}
-
-		while (isalnum(c)) {
-			token->text += c;
-			if (reader.endOfLine()) {
-				break;
-			}
-			c = reader.nextSymbol();
-			if (!isalnum(c)) {
-				reader.symbolRollback();
-				break;
-			}
-		}
-		token->type = CONST_HEX;
-		token->assignValue();
 	}
 	else {
 		token->type = operators[std::string({ c })];
