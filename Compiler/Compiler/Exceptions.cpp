@@ -3,7 +3,7 @@
 
 LexicalException::LexicalException(int row, int col, std::string mes)
 {
-	sprintf(message, "Lexical exception in row : %d column : %d - %s", row, col, mes.c_str());
+	sprintf(message, "Lexical exception in position (%d,%d) - %s", row, col, mes.c_str());
 }
 
 const char * LexicalException::what() const
@@ -13,7 +13,7 @@ const char * LexicalException::what() const
 
 SyntaxException::SyntaxException(int row, int col, std::string mes)
 {
-	sprintf(message, "Syntax exception in row : %d column : %d - %s", row, col, mes.c_str());
+	sprintf(message, "Syntax exception in position (%d,%d) - %s", row, col, mes.c_str());
 }
 
 const char * SyntaxException::what() const

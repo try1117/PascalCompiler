@@ -1,2 +1,2 @@
 1  | 1  | KEYWORD_BEGIN            | begin                    | 
-Lexical exception in row : 2 column : 1 - Missing terminating ' character
+Lexical exception in position (2,1) - Missing terminating ' character
