@@ -211,10 +211,6 @@ void Tokenizer::parseSpecialNumber(char c)
 		}
 	}
 	token->assignValue(token->text.substr(1, token->text.length()), base);
-	
-	if (token->type == CONST_CHARACTER && !(0 <= std::stoi(token->value) && std::stoi(token->value) <= 255)) {
-		throw LexicalException(token->row, token->col, errorMessage);
-	}
 }
 
 void Tokenizer::parseNumber(char c)
@@ -320,7 +316,10 @@ void Tokenizer::parseWord(char c)
 			}
 			token->text += c;
 		}
-		token->type = CONST_STRING;
+		token->value.string = new char[token->text.length() + 1];
+		strcpy(token->value.string, token->text.c_str());
+		token->stringAllocated = true;
+		token->type = (token->text.length() == 1 ? CONST_CHARACTER : CONST_STRING);
 		return;
 	}
 	

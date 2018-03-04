@@ -1,0 +1,2 @@
+1  | 1  | CONST_CHARACTER          | #0                       | 
+Lexical exception in row : 2 column : 1 - Decimal number from 0 to 255 expected

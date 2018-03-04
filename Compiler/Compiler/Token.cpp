@@ -2,9 +2,18 @@
 #include "Token.h"
 #include "Exceptions.h"
 
-Token::Token(TokenType type, int row, int col, std::string text, std::string value)
-	: type(type), row(row), col(col), text(text), value(value)
+#include <memory>
+
+Token::Token(TokenType type, int row, int col, std::string text)
+	: type(type), row(row), col(col), text(text), stringAllocated(false)
 {
+}
+
+Token::~Token()
+{
+	if (stringAllocated) {
+		delete value.string;
+	}
 }
 
 std::string stringPadding(int len, std::string s) {
@@ -18,7 +27,7 @@ std::string Token::toString()
 		stringPadding(3, std::to_string(col)) + "| " +
 		stringPadding(25, TokenName[type]) + "| " +
 		stringPadding(25, text) + "| " +
-		value;
+		textValue;
 
 	return res;
 }
@@ -27,22 +36,34 @@ void Token::assignValue(std::string text, int base)
 {
 	try {
 		if (type == CONST_INTEGER) {
-			value = std::to_string(std::stoll(text, 0, base));
+			value.integer = std::stoi(text, 0, base);
+			textValue = std::to_string(value.integer);
 		}
 		else if (type == CONST_DOUBLE) {
+			value.real = std::stod(text);
 			char number[40];
-			sprintf(number, "%.15lf", std::stod(text));
-			value = number;
+			sprintf(number, "%.15lf", value.real);
+			textValue = number;
 		}
 		else if (type == CONST_CHARACTER) {
-			value = char(std::stoi(text));
+			if (std::stoi(text) < 0 || 255 < std::stoi(text)) {
+				throw LexicalException(row, col, "Illegal char constant");
+			}
+			value.string = new char[2];
+			value.string[0] = char(std::stoi(text));
+			value.string[1] = 0;
+			stringAllocated = true;
+			textValue = value.string;
 		}
 		else {
-			value = "";
+			textValue = "";
 		}
 	}
 	catch (std::out_of_range e) {
 		throw LexicalException(row, col, "Number is too big");
+	}
+	catch (LexicalException e) {
+		throw e;
 	}
 	catch (std::exception e) {
 		throw LexicalException(row, col, e.what());

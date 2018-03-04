@@ -6,17 +6,21 @@ enum TokenType;
 extern std::string TokenName[];
 
 struct Token {
-	enum ValueType {
-		INTEGER,
-		DOUBLE,
-	};
-
 	TokenType type;
 	std::string text;
-	std::string value;
+	std::string textValue;
 	int row, col;
 
-	Token(TokenType type, int row, int col, std::string text = "", std::string value = "");
+	union Value {
+		int integer;
+		double real;
+		char *string;
+	} value;
+
+	bool stringAllocated;
+
+	Token(TokenType type, int row, int col, std::string text = "");
+	~Token();
 	std::string toString();
 	void assignValue(std::string text, int base);
 };

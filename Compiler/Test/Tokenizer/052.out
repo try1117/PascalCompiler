@@ -1,0 +1,6 @@
+1  | 1  | CONST_STRING             | string                   | 
+2  | 1  | CONST_CHARACTER          | c                        | 
+2  | 4  | OP_CAP                   | ^                        | 
+2  | 5  | CONST_CHARACTER          | h                        | 
+2  | 8  | OP_CAP                   | ^                        | 
+2  | 9  | CONST_STRING             | ar                       | 

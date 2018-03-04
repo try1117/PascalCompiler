@@ -3,7 +3,7 @@
 2  | 4  | OP_COLON                 | :                        | 
 2  | 5  | KEYWORD_INTEGER          | integer                  | 
 2  | 13 | OP_EQUAL                 | =                        | 
-2  | 15 | CONST_HEX                | fff                      | 4095
+2  | 15 | CONST_INTEGER            | $fff                     | 4095
 2  | 19 | SEP_SEMICOLON            | ;                        | 
 3  | 3  | VARIABLE                 | b                        | 
 3  | 4  | OP_COLON                 | :                        | 
