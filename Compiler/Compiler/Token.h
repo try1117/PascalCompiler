@@ -13,7 +13,7 @@ struct Token {
 
 	union Value {
 		int integer;
-		double real;
+		double _double;
 		char *string;
 	} value;
 

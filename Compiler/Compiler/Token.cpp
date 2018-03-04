@@ -40,9 +40,9 @@ void Token::assignValue(std::string text, int base)
 			textValue = std::to_string(value.integer);
 		}
 		else if (type == CONST_DOUBLE) {
-			value.real = std::stod(text);
+			value._double = std::stod(text);
 			char number[40];
-			sprintf(number, "%.15lf", value.real);
+			sprintf(number, "%.15lf", value._double);
 			textValue = number;
 		}
 		else if (type == CONST_CHARACTER) {
