@@ -119,6 +119,7 @@ bool Tokenizer::next()
 		token->text = "";
 		
 		if (c == 0) {
+			token->text = "end of file";
 			token->type = KEYWORD_EOF;
 			return false;
 		}

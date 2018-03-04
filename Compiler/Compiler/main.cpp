@@ -4,6 +4,7 @@
 
 #include "Tokenizer.h"
 #include "ExpressionParser.h"
+#include "Parser.h"
 #include "Exceptions.h"
 
 int main(int argc, char *argv[])
@@ -43,6 +44,23 @@ int main(int argc, char *argv[])
 			try {
 				auto e = exprParser.parse();
 				e->print(output);
+			}
+			catch (LexicalException e) {
+				output << e.what() << std::endl;
+			}
+			catch (SyntaxException e) {
+				output << e.what() << std::endl;
+			}
+			catch (std::exception e) {
+				output << e.what() << std::endl;
+			}
+		}
+		else if (strcmp(argv[1], "-s") == 0) {
+			Parser parser(std::shared_ptr<Tokenizer>(new Tokenizer(argv[2])));
+			std::ofstream output("output.txt");
+
+			try {
+				parser.parse();
 			}
 			catch (LexicalException e) {
 				output << e.what() << std::endl;
