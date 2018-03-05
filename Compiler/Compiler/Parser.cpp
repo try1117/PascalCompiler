@@ -55,9 +55,35 @@ void Parser::parseProgram()
 	}
 
 	parseBlock();
-	return ;
 }
 
 void Parser::parseBlock()
+{
+	declarationPart();
+	statementPart();
+}
+
+void Parser::declarationPart()
+{
+	while (true) {
+		goToNextToken();
+
+		if (currentTokenType() == KEYWORD_TYPE) {
+			goToNextToken();
+			require({ VARIABLE });
+			//while ()
+		}
+		else {
+			return;
+		}
+	}
+}
+
+void Parser::typeDeclarationPart()
+{
+
+}
+
+void Parser::statementPart()
 {
 }

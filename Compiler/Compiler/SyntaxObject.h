@@ -2,16 +2,16 @@
 #include <memory>
 #include <fstream>
 #include <string>
+#include <vector>
+
 #include "Token.h"
 
 class SyntaxObject {
 public:
-	std::shared_ptr<SyntaxObject> left, right;
+	std::vector<std::shared_ptr<SyntaxObject>> children;
 	std::shared_ptr<Token> token;
 
-	SyntaxObject(std::shared_ptr<Token> token, std::shared_ptr<SyntaxObject> left = nullptr,
-		std::shared_ptr<SyntaxObject> right = nullptr);
-
+	SyntaxObject(std::shared_ptr<Token> token, std::initializer_list<std::shared_ptr<SyntaxObject>> children = {});
 	void print(std::ofstream &output, std::string prefix = "", bool end = true);
 };
 

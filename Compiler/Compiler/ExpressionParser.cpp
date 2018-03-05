@@ -18,7 +18,7 @@ std::shared_ptr<Expression> ExpressionParser::parseExpr()
 
 	while (isExpr(token)) {
 		tokenizer->next();
-		node = std::make_shared<ExprBinaryOp>(token, node, parseTerm());
+		node = std::make_shared<ExprBinaryOp>(token, std::initializer_list<std::shared_ptr<SyntaxObject>>({ node, parseTerm() }));
 		token = tokenizer->getCurrentToken();
 	}
 
@@ -32,7 +32,7 @@ std::shared_ptr<Expression> ExpressionParser::parseTerm()
 
 	while (isTerm(token)) {
 		tokenizer->next();
-		node = std::make_shared<ExprBinaryOp>(token, node, parseFactor());
+		node = std::make_shared<ExprBinaryOp>(token, std::initializer_list<std::shared_ptr<SyntaxObject>>({ node, parseFactor() }));
 		token = tokenizer->getCurrentToken();
 	}
 
@@ -56,7 +56,7 @@ std::shared_ptr<Expression> ExpressionParser::parseFactor()
 		return std::make_shared<ExprVar>(token);
 	}
 	else if (token->type == OP_MINUS || token->type == OP_PLUS) {
-		return std::make_shared<ExprUnaryOp>(token, parseFactor());
+		return std::make_shared<ExprUnaryOp>(token, std::initializer_list<std::shared_ptr<SyntaxObject>>({ parseFactor() }));
 	}
 	else {
 		throw SyntaxException(token->row, token->col, "Expected identifier, constant or expression");

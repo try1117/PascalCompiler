@@ -18,4 +18,9 @@ private:
 
 	void parseProgram();
 	void parseBlock();
+
+	void declarationPart();
+	void typeDeclarationPart();
+	
+	void statementPart();
 };
