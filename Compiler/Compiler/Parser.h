@@ -1,26 +1,35 @@
 #pragma once
 #include "Tokenizer.h"
 #include "SyntaxObject.h"
+#include "Types.h"
+#include "SymbolTable.h"
 
 class Parser {
 public:
 	Parser(std::shared_ptr<Tokenizer> tokenizer);
-	void parse();
+	PType parse();
 
 private:
 	std::shared_ptr<Tokenizer> tokenizer;
 	std::string programName;
+	std::vector<SymbolTable> tables;
 
 	void goToNextToken();
-	std::shared_ptr<Token> currentToken();
+	PToken currentToken();
 	TokenType currentTokenType();
-	void require(std::initializer_list<TokenType> types);
+	void requireCurrent(std::initializer_list<TokenType> types);
+	void requireNext(std::initializer_list<TokenType> types);
 
 	void parseProgram();
-	void parseBlock();
 
 	void declarationPart();
 	void typeDeclarationPart();
-	
-	void statementPart();
+	PType parseType();
+
+	void variableDeclarationPart();
+	std::vector<PSyntaxNode> identifierList();
+
+	PSyntaxNode compoundStatement();
+	PSyntaxNode statementList();
+	PSyntaxNode parseStatement();
 };

@@ -4,6 +4,7 @@
 
 #include "Tokenizer.h"
 #include "Exceptions.h"
+#include "Utils.h"
 
 std::map<std::string, TokenType> operators = {
 	{ "+", OP_PLUS },
@@ -336,8 +337,7 @@ void Tokenizer::parseWord(char c)
 		}
 	}
 	
-	std::string low = token->text;
-	std::transform(low.begin(), low.end(), low.begin(), ::tolower);
+	std::string low = lowerString(token->text);
 	token->type = (keywords.count(low) ? keywords[low] : VARIABLE);
 }
 

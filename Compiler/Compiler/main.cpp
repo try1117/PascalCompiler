@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 			try {
 				auto e = exprParser.parse();
-				e->print(output);
+				//e->print(output);
 			}
 			catch (LexicalException e) {
 				output << e.what() << std::endl;
@@ -60,7 +60,8 @@ int main(int argc, char *argv[])
 			std::ofstream output("output.txt");
 
 			try {
-				parser.parse();
+				PType mainFunction = parser.parse();
+				output << mainFunction->toString();
 			}
 			catch (LexicalException e) {
 				output << e.what() << std::endl;

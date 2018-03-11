@@ -1,15 +1,17 @@
 ﻿#include <codecvt>
 #include "SyntaxObject.h"
 
-SyntaxObject::SyntaxObject(std::shared_ptr<Token> token, std::initializer_list<std::shared_ptr<SyntaxObject>> children)
+SyntaxNode::SyntaxNode(std::shared_ptr<Token> token, std::initializer_list<std::shared_ptr<SyntaxNode>> children)
 	: token(token), children(children)
 {
 }
 
-void SyntaxObject::print(std::ofstream &output, std::string prefix, bool end)
+void SyntaxNode::print(std::stringstream &output, std::string prefix, bool end)
 {
 	//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	output << prefix + (end ? "--- " : "|-- ") + token->text << std::endl; //converter.from_bytes(token->text) << std::endl;
+	if (token) {
+		output << prefix + (end ? "--- " : "|-- ") + token->text << std::endl; //converter.from_bytes(token->text) << std::endl;
+	}
 
 	if (children.empty()) {
 		return;
@@ -20,4 +22,13 @@ void SyntaxObject::print(std::ofstream &output, std::string prefix, bool end)
 	for (int i = 1; i < children.size(); ++i) {
 		children[i]->print(output, prefix + (end ? "    " : "|   "), i == (int)children.size() - 1);
 	}
+}
+
+std::string SyntaxNode::toString(std::string prefix)
+{
+	std::stringstream tmp;
+	print(tmp, prefix, false);
+	std::string res;
+	tmp >> res;
+	return res;
 }

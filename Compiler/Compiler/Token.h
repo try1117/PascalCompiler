@@ -1,9 +1,13 @@
 #pragma once
 #include <map>
 #include <string>
+#include <memory>
 
 enum TokenType;
 extern std::string TokenName[];
+
+struct Token;
+typedef std::shared_ptr<Token> PToken;
 
 struct Token {
 	TokenType type;

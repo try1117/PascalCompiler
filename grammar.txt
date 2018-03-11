@@ -4,7 +4,7 @@ parantheses ( ) indicate simple grouping of constructs; a vertical bar | indicat
 literal text in definitions is denoted using double quotation marks " ".
 http://www.fit.vutbr.cz/study/courses/APR/public/ebnf.html#identifier
 
-program = [ program_header, ";" ], block, ".";
+program = program_header, ";", block, ".";
 
 program_header = "program", identifier;
 
