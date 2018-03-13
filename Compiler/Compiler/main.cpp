@@ -38,22 +38,22 @@ int main(int argc, char *argv[])
 			//std::system("pause");
 		}
 		else if (strcmp(argv[1], "-exp") == 0) {
-			ExpressionParser exprParser(std::shared_ptr<Tokenizer>(new Tokenizer(argv[2])));
-			std::ofstream output("output.txt");
-
-			try {
-				auto e = exprParser.parse();
-				//e->print(output);
-			}
-			catch (LexicalException e) {
-				output << e.what() << std::endl;
-			}
-			catch (SyntaxException e) {
-				output << e.what() << std::endl;
-			}
-			catch (std::exception e) {
-				output << e.what() << std::endl;
-			}
+			//ExpressionParser exprParser(std::shared_ptr<Tokenizer>(new Tokenizer(argv[2])));
+			//std::ofstream output("output.txt");
+			//
+			//try {
+			//	auto e = exprParser.parse();
+			//	e->print(output);
+			//}
+			//catch (LexicalException e) {
+			//	output << e.what() << std::endl;
+			//}
+			//catch (SyntaxException e) {
+			//	output << e.what() << std::endl;
+			//}
+			//catch (std::exception e) {
+			//	output << e.what() << std::endl;
+			//}
 		}
 		else if (strcmp(argv[1], "-s") == 0) {
 			Parser parser(std::shared_ptr<Tokenizer>(new Tokenizer(argv[2])));

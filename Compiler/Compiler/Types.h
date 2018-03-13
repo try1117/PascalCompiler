@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 
+#include "SymbolTable.h"
 #include "SyntaxObject.h"
 
 class Type;
@@ -33,12 +34,13 @@ public:
 
 class FunctionType : public Type {
 public:
+	PSymbolTable declarations;
 	PType returnType;
 	PSyntaxNode body;
 	std::string name;
 
 	static std::string indent;
 
-	FunctionType(PType returnType, PSyntaxNode body, std::string name);
+	FunctionType(PSymbolTable declarations, PType returnType, PSyntaxNode body, std::string name);
 	std::string toString();
 };

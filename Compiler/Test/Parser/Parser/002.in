@@ -1,1 +1,5 @@
-program abc
+program abc;
+var
+ a:integer; 
+begin
+end.

@@ -1,0 +1,11 @@
+program abc;
+type
+  myInteger = integer;
+  myDouble = double; 
+  int = myInteger;
+  anotherInt = int;  
+  ch = char;
+  chch = ch;
+  mystr = string;
+begin
+end.

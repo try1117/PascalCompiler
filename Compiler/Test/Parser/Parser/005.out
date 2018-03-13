@@ -1,0 +1,11 @@
+abc : function()
+   resultType : Nil
+   
+Declarations:
+   myInteger : Type Integer
+   myDouble : Type Double
+   int : Type Integer
+   anotherInt : Type Integer
+   ch : Type Char
+   chch : Type Char
+   mystr : Type String

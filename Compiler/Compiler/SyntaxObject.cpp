@@ -1,7 +1,7 @@
 ﻿#include <codecvt>
 #include "SyntaxObject.h"
 
-SyntaxNode::SyntaxNode(std::shared_ptr<Token> token, std::initializer_list<std::shared_ptr<SyntaxNode>> children)
+SyntaxNode::SyntaxNode(PToken token, std::initializer_list<PSyntaxNode> children)
 	: token(token), children(children)
 {
 }

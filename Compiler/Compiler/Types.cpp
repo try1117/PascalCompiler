@@ -31,8 +31,8 @@ std::string Type::toString()
 	return categoryName[category];
 }
 
-FunctionType::FunctionType(PType returnType, PSyntaxNode body, std::string name)
-	: returnType(returnType), body(body), name(name)
+FunctionType::FunctionType(PSymbolTable declarations, PType returnType, PSyntaxNode body, std::string name)
+	: declarations(declarations), returnType(returnType), body(body), name(name)
 {
 }
 
@@ -42,6 +42,19 @@ std::string FunctionType::toString()
 	res += indent + name + " : function()" + "\n";
 	indent += "   ";
 	res += indent + "resultType : " + returnType->toString() + "\n";
+	
+	res += indent + "\nDeclarations:\n";
+
+	for (auto it : declarations->symbolsArray) {
+		if (it->type->category == Type::Category::FUNCTION) {
+			continue;
+		}
+		else {
+			std::string symcat = Symbol::categoryName[it->category];
+			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + Type::categoryName[it->type->category] + "\n";
+		}
+	}
+	
 	if (body != nullptr) {
 		res += body->toString(indent);
 	}

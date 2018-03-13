@@ -1,1 +1,12 @@
-Syntax exception in position (1,8) - Required VARIABLE but found ;
+abc : function()
+   resultType : Nil
+   
+Declarations:
+   a : Integer
+   b : Integer
+   c : Integer
+   d : Integer
+   c3 : Char
+   e : Double
+   c1 : Char
+   c2 : Char

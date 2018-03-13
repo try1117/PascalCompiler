@@ -6,22 +6,39 @@
 #include <sstream>
 
 #include "Token.h"
+//#include "Types.h" // ALERT circular dependencies, need to move FunctionType to another module?
 
 class SyntaxNode;
 typedef std::shared_ptr<SyntaxNode> PSyntaxNode;
 
+class Type;
+typedef std::shared_ptr<Type> PType;
+
 class SyntaxNode {
 public:
 	std::vector<std::shared_ptr<SyntaxNode>> children;
-	std::shared_ptr<Token> token;
+	PToken token;
 
 	SyntaxNode() {}
-	SyntaxNode(std::shared_ptr<Token> token, std::initializer_list<std::shared_ptr<SyntaxNode>> children = {});
+	SyntaxNode(PToken token, std::initializer_list<PSyntaxNode> children = {});
 	void print(std::stringstream &output, std::string prefix = "", bool end = true);
 	std::string toString(std::string prefix = "");
 };
 
 class VarNode : public SyntaxNode {
+public:
+	PType type;
+
+	VarNode(PToken token, PType type)
+		: SyntaxNode(token), type(type)
+	{}
+};
+
+class UnaryOpNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
+class NotNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
 };
 

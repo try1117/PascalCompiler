@@ -2,3 +2,5 @@ abc : function()
    resultType : Nil
    
 Declarations:
+   myInteger : Type Integer
+   myDouble : Type Double
