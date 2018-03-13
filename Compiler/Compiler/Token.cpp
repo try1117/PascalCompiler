@@ -130,7 +130,7 @@ std::string TokenName[] = {
 	"KEYWORD_READ",
 	"KEYWORD_READLN",
 	"KEYWORD_EOF",
-	"VARIABLE",
+	"IDENTIFIER",
 
 	// Separators
 	"SEP_BRACKET_LEFT",

@@ -338,7 +338,7 @@ void Tokenizer::parseWord(char c)
 	}
 	
 	std::string low = lowerString(token->text);
-	token->type = (keywords.count(low) ? keywords[low] : VARIABLE);
+	token->type = (keywords.count(low) ? keywords[low] : IDENTIFIER);
 }
 
 void Tokenizer::parseSeparator(char c)

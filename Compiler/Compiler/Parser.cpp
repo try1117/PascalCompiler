@@ -129,7 +129,7 @@ PSyntaxNode Parser::parseFactor()
 	else if (token->type == KEYWORD_NOT) {
 		return std::make_shared<NotNode>(token, std::initializer_list<PSyntaxNode>({ parseFactor() }));
 	}
-	else if (token->type == VARIABLE) {
+	else if (token->type == IDENTIFIER) {
 		return std::make_shared<VarNode>(token, getSymbol(token)->type);
 	}
 	else {
@@ -165,7 +165,7 @@ PType Parser::parse()
 void Parser::parseProgram()
 {
 	requireNext({ KEYWORD_PROGRAM });
-	requireNext({ VARIABLE });
+	requireNext({ IDENTIFIER });
 	programName = currentToken()->text;
 	requireNext({ SEP_SEMICOLON });
 	goToNextToken();
@@ -195,7 +195,7 @@ void Parser::declarationPart()
 void Parser::typeDeclarationPart()
 {
 	do {
-		requireCurrent({ VARIABLE });
+		requireCurrent({ IDENTIFIER });
 		auto identifier = currentToken();
 		requireNext({ OP_EQUAL });
 		goToNextToken();
@@ -203,7 +203,7 @@ void Parser::typeDeclarationPart()
 		tables.back()->addType(identifier, type);
 		requireCurrent({ SEP_SEMICOLON });
 		goToNextToken();
-	} while (currentTokenType() == VARIABLE);
+	} while (currentTokenType() == IDENTIFIER);
 }
 
 PType Parser::parseType()
@@ -218,7 +218,7 @@ PType Parser::parseType()
 	PToken token = currentToken();
 	goToNextToken();
 
-	if (token->type == VARIABLE) {
+	if (token->type == IDENTIFIER) {
 		return typeAlias(token);
 	}
 	else if (simpleCategories.count(token->type)) {
@@ -237,14 +237,14 @@ PType Parser::typeAlias(PToken token)
 void Parser::variableDeclarationPart()
 {
 	do {
-		requireCurrent({ VARIABLE });
+		requireCurrent({ IDENTIFIER });
 		auto identifiers = identifierList();
 		PType type = parseType();
 		// TODO: initialization
 		tables.back()->addVariables(identifiers, type);
 		requireCurrent({ SEP_SEMICOLON });
 		goToNextToken();
-	} while (currentTokenType() == VARIABLE);
+	} while (currentTokenType() == IDENTIFIER);
 }
 
 std::vector<PToken> Parser::identifierList()
@@ -265,7 +265,7 @@ std::vector<PToken> Parser::identifierList()
 
 void Parser::constDeclarationPart()
 {
-	requireNext({ VARIABLE });
+	requireNext({ IDENTIFIER });
 	PToken identifier = currentToken();
 	goToNextToken();
 
@@ -299,7 +299,7 @@ PSyntaxNode Parser::statementList()
 PSyntaxNode Parser::parseStatement()
 {
 	switch (currentTokenType()) {
-		case VARIABLE:
+		case IDENTIFIER:
 			return nullptr;
 		case KEYWORD_BEGIN:
 			return compoundStatement();
