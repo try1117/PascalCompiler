@@ -1,4 +1,5 @@
 #include "Types.h"
+#include "Utils.h"
 
 const std::vector<std::string> Type::categoryName = {
 	"Integer",
@@ -9,6 +10,14 @@ const std::vector<std::string> Type::categoryName = {
 	"Record",
 	"Function",
 	"Nil",
+};
+
+const std::set<Type::Category> Type::simpleCategories = {
+	Type::INTEGER,
+	Type::DOUBLE,
+	Type::CHAR,
+	Type::STRING,
+	Type::NIL,
 };
 
 std::string FunctionType::indent = "";
@@ -52,6 +61,11 @@ std::string FunctionType::toString()
 		else {
 			std::string symcat = Symbol::categoryName[it->category];
 			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + Type::categoryName[it->type->category] + "\n";
+			std::string strValue;
+			if (it->value != nullptr) {
+				strValue = it->value->toString(std::string((indent + it->token->text).length() - 1, ' '));
+			}
+			res += (strValue.empty() ? "" : strValue + "\n");
 		}
 	}
 	

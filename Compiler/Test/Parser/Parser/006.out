@@ -1,0 +1,8 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   int : Type Integer
+   a : Integer
+   db : Type Double
+   b : Double

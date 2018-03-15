@@ -39,6 +39,13 @@ void SymbolTable::addVariables(std::vector<PToken> tokens, PType type)
 	}
 }
 
+void SymbolTable::addConstant(PToken token, PType type, PSyntaxNode value)
+{
+	checkDuplication(token);
+	PSymbol sym = std::make_shared<Symbol>(token, type, Symbol::Category::CONST, value);
+	addSymbol(sym);
+}
+
 PSymbol SymbolTable::getSymbol(PToken token)
 {
 	std::string low = lowerString(token->text);

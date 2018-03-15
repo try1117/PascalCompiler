@@ -1,0 +1,6 @@
+program test;
+const
+  a : integer = 5; 
+  b : double = 10 * 543.21;
+begin
+end.

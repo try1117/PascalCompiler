@@ -1,0 +1,5 @@
+program test;
+const
+  b : double = (1 * 2.2) + (333.3 - 44) / (5.55 * 6 + 0.07);
+begin
+end.

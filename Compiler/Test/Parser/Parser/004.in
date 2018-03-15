@@ -1,6 +1,6 @@
 program abc;
 type
- myInteger = integer;
- myDouble = double; 
+  myInteger = integer;
+  myDouble = double; 
 begin
 end.

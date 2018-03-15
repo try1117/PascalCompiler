@@ -1,4 +1,5 @@
 #include <functional>
+#include <algorithm>
 #include "Parser.h"
 #include "Exceptions.h"
 
@@ -44,38 +45,12 @@ void Parser::requireNext(std::initializer_list<TokenType> types)
 	requireCurrent(types);
 }
 
-std::set<TokenType> Parser::logicalTypes = {
-	OP_GREATER,
-	OP_LESS,
-	OP_GREATER_OR_EQUAL,
-	OP_LESS_OR_EQUAL,
-	OP_EQUAL,
-	OP_NOT_EQUAL,
-};
-
-std::set<TokenType> Parser::exprTypes = {
-	OP_PLUS,
-	OP_MINUS,
-	KEYWORD_OR,
-	KEYWORD_XOR,
-};
-
-std::set<TokenType> Parser::termTypes = {
-	OP_MULT,
-	OP_DIVISION,
-	KEYWORD_DIV,
-	KEYWORD_MOD,
-	KEYWORD_AND,
-	KEYWORD_SHL,
-	KEYWORD_SHR,
-};
-
 PSyntaxNode Parser::parseLogical()
 {
 	auto node = parseExpr();
 	auto token = currentToken();
 
-	while (logicalTypes.count(token->type)) {
+	while (Operation::logicalTypes.count(token->type)) {
 		goToNextToken();
 		node = createOperationNode(node, parseExpr(), token);
 		token = currentToken();
@@ -89,7 +64,7 @@ PSyntaxNode Parser::parseExpr()
 	auto node = parseTerm();
 	auto token = currentToken();
 
-	while (exprTypes.count(token->type)) {
+	while (Operation::exprTypes.count(token->type)) {
 		goToNextToken();
 		node = createOperationNode(node, parseTerm(), token);
 		token = currentToken();
@@ -103,7 +78,7 @@ PSyntaxNode Parser::parseTerm()
 	auto node = parseFactor();
 	auto token = currentToken();
 
-	while (termTypes.count(token->type)) {
+	while (Operation::termTypes.count(token->type)) {
 		goToNextToken();
 		node = createOperationNode(node, parseFactor(), token);
 		token = currentToken();
@@ -124,13 +99,32 @@ PSyntaxNode Parser::parseFactor()
 		return node;
 	}
 	else if (token->type == OP_MINUS || token->type == OP_PLUS) {
-		return std::make_shared<UnaryOpNode>(token, std::initializer_list<PSyntaxNode>({ parseFactor() }));
+		return std::make_shared<UnaryOpNode>(token, nullptr, std::initializer_list<PSyntaxNode>({ parseFactor() }));
 	}
 	else if (token->type == KEYWORD_NOT) {
-		return std::make_shared<NotNode>(token, std::initializer_list<PSyntaxNode>({ parseFactor() }));
+		return std::make_shared<NotNode>(token, nullptr, std::initializer_list<PSyntaxNode>({ parseFactor() }));
 	}
 	else if (token->type == IDENTIFIER) {
+		if (instanceOfConstNode(getSymbol(token)->value)) {
+			return getSymbol(token)->value;
+		}
 		return std::make_shared<VarNode>(token, getSymbol(token)->type);
+	}
+	else if (token->type == CONST_INTEGER) {
+		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::INTEGER),
+			std::make_shared<IdentifierValue>(token->value->get.integer));
+	}
+	else if (token->type == CONST_DOUBLE) {
+		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::DOUBLE),
+			std::make_shared<IdentifierValue>(token->value->get._double));
+	}
+	else if (token->type == CONST_CHARACTER) {
+		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::CHAR),
+			std::make_shared<IdentifierValue>(token->value->get.string));
+	}
+	else if (token->type == CONST_STRING) {
+		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::STRING),
+			std::make_shared<IdentifierValue>(token->value->get.string));
 	}
 	else {
 		throw SyntaxException(token->row, token->col, "Expected identifier, constant or expression");
@@ -147,9 +141,126 @@ PSymbol Parser::getSymbol(PToken token)
 	throw LexicalException(token->row, token->col, "Identifier " + token->text + " not found");
 }
 
+PType Parser::getOperationType(PType left, PType right, PToken operation)
+{
+	if (Operation::logicalTypes.count(operation->type)) {
+		bool compatibilityTable[4][4] = {
+			/* --- INT, DBL, CHR, STR */
+			/* INT */ { 1, 1, 0, 0 },
+			/* DBL */ { 1, 1, 0, 0 },
+			/* CHR */ { 0, 0, 1, 1 },
+			/* STR */ { 0, 0, 1, 1 },
+		};
+
+		if (compatibilityTable[left->category][right->category]) {
+			return Type::getSimpleType(Type::Category::INTEGER);
+		}
+	}
+	else if (Operation::integerOperationTypes.count(operation->type)) {
+		if (left->category == Type::Category::INTEGER && right->category == Type::Category::INTEGER) {
+			return Type::getSimpleType(Type::Category::INTEGER);
+		}
+	}
+	else if (Operation::simpleArithmeticTypes.count(operation->type)) {
+		std::set<Type::Category> numbers = { Type::Category::INTEGER, Type::Category::DOUBLE };
+		if (numbers.count(left->category) && numbers.count(right->category)) {
+			if (left->category == Type::Category::INTEGER && right->category == Type::Category::INTEGER) {
+				return Type::getSimpleType(Type::Category::INTEGER);
+			}
+			else {
+				return Type::getSimpleType(Type::Category::DOUBLE);
+			}
+		}
+
+		std::set<Type::Category> strings = { Type::Category::CHAR, Type::Category::STRING };
+		if (strings.count(left->category) && strings.count(right->category) && operation->type == OP_PLUS) {
+			return Type::getSimpleType(Type::Category::STRING);
+		}
+	}
+
+	throw LexicalException(operation->row, operation->col,
+		"Unsupported operand types "
+		+ Type::categoryName[left->category] + " and " + Type::categoryName[right->category]
+		+ " for operation " + operation->text
+	);
+}
+
+PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
+{
+	if (node->type->category != to->category) {
+		return std::make_shared<CastNode>(node, to);
+	}
+	return node;
+}
+
+PSyntaxNode Parser::castConstNode(PSyntaxNode node, PType to)
+{
+	if (node->type->category != to->category) {
+		auto cur = std::static_pointer_cast<ConstNode>(node);
+		if (to->category == Type::Category::DOUBLE) {
+			cur->value->get._double = (double)cur->value->get.integer;
+		}
+		cur->type = Type::getSimpleType(to->category);
+		return cur;
+	}
+	return node;
+}
+
 PSyntaxNode Parser::createOperationNode(PSyntaxNode left, PSyntaxNode right, PToken operation)
 {
-	return PSyntaxNode();
+	PType operationType = getOperationType(left->type, right->type, operation);
+	bool leftIsConst = instanceOfConstNode(left);
+	bool rightIsConst = instanceOfConstNode(right);
+
+	// result of logical operation is INTEGER
+	// while operand types can be: INTEGER, DOUBLE, CHAR, STRING
+	if (leftIsConst && rightIsConst && Operation::logicalTypes.count(operation->type)) {
+		PIdentifierValue value = nullptr;
+		auto lNode = std::static_pointer_cast<ConstNode>(left);
+		auto rNode = std::static_pointer_cast<ConstNode>(right);
+
+		Type::Category lcat = left->type->category;
+		Type::Category rcat = right->type->category;
+
+		if (lcat == Type::INTEGER && rcat == Type::INTEGER) {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<int>(lNode->value->get.integer, rNode->value->get.integer, operation));
+		}
+		else if (lcat == Type::INTEGER) {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<double>(lNode->value->get.integer, rNode->value->get._double, operation));
+		}
+		else if (rcat == Type::INTEGER) {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<double>(lNode->value->get._double, rNode->value->get.integer, operation));
+		}
+		else {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<std::string>(lNode->value->get.string, rNode->value->get.string, operation));
+		}
+		return std::make_shared<ConstNode>(operation, operationType, value);
+	}
+
+	// otherwise cast operands to operationType
+	left = (leftIsConst ? castConstNode(left, operationType) : cast(left, operationType));
+	right = (rightIsConst ? castConstNode(right, operationType) : cast(right, operationType));
+	if (leftIsConst && rightIsConst) {
+		return std::make_shared<ConstNode>(operation, operationType, evalOperation(left, right, operation, operationType));
+	}
+	return std::make_shared<BinaryOpNode>(operation, operationType, std::initializer_list<PSyntaxNode>({left, right}));
+}
+
+PIdentifierValue Parser::evalOperation(PSyntaxNode left, PSyntaxNode right, PToken operation, PType operationType)
+{
+	auto leftNode = std::static_pointer_cast<ConstNode>(left);
+	auto rightNode = std::static_pointer_cast<ConstNode>(right);
+	
+	if (operationType->category == Type::Category::INTEGER) {
+		return std::make_shared<IdentifierValue>(Operation::evalIntegers(leftNode->value->get.integer, rightNode->value->get.integer, operation));
+	}
+	else if (operationType->category == Type::Category::DOUBLE) {
+		return std::make_shared<IdentifierValue>(Operation::evalDoubles(leftNode->value->get._double, rightNode->value->get._double, operation));
+	}
+	// char or string
+	else {
+		return std::make_shared<IdentifierValue>(Operation::evalStrings(leftNode->value->get.string, rightNode->value->get.string, operation));
+	}
 }
 
 PType Parser::parse()
@@ -263,15 +374,72 @@ std::vector<PToken> Parser::identifierList()
 	return res;
 }
 
+bool Parser::instanceOfConstNode(PSyntaxNode node)
+{
+	return std::static_pointer_cast<ConstNode>(node) != nullptr;
+	//return typeid(node) == typeid(ConstNode);
+}
+
 void Parser::constDeclarationPart()
 {
-	requireNext({ IDENTIFIER });
-	PToken identifier = currentToken();
-	goToNextToken();
+	do {
+		requireCurrent({ IDENTIFIER });
+		PToken token = currentToken();
+		requireNext({ OP_EQUAL, OP_COLON });
 
-	// untyped constant
-	if (currentTokenType() == OP_EQUAL) {
-		PSyntaxNode expr = parseExpr();
+		// untyped constant
+		if (currentTokenType() == OP_EQUAL) {
+			goToNextToken();
+			PSyntaxNode node = parseLogical();
+			if (!instanceOfConstNode(node)) {
+				throw LexicalException(node->token->row, node->token->col, "Illegal expression");
+			}
+			tables.back()->addConstant(token, node->type, node);
+		}
+		// typed constant
+		else if (currentTokenType() == OP_COLON) {
+			goToNextToken();
+			PType type = parseType();
+			requireCurrent({ OP_EQUAL });
+			goToNextToken();
+			PSyntaxNode value = typedConstant(type);
+			tables.back()->addConstant(token, type, value);
+		}
+		requireCurrent({ SEP_SEMICOLON });
+		goToNextToken();
+	} while (currentTokenType() == IDENTIFIER);
+}
+
+void Parser::requireTypesCompatibility(PType left, PType right)
+{
+	std::vector<std::pair<Type::Category, Type::Category>> pairs = {
+		{ Type::DOUBLE, Type::INTEGER },
+		{ Type::STRING, Type::CHAR },
+	};
+
+	bool res = (left->category == right->category);
+	for (auto it : pairs) {
+		res = std::max(res, left->category == it.first && right->category == it.second);
+	}
+
+	if (!res) {
+		throw LexicalException(currentToken()->row, currentToken()->col,
+			"Incompatible types, expected " + Type::categoryName[right->category] + " but found " + Type::categoryName[left->category]);
+	}
+}
+
+PSyntaxNode Parser::typedConstant(PType type)
+{
+	if (Type::simpleCategories.count(type->category)) {
+		PSyntaxNode node = parseLogical();
+		requireTypesCompatibility(type, node->type);
+		if (instanceOfConstNode(node)) {
+			return castConstNode(node, type);
+		}
+		if (node->type->category != type->category) {
+			return std::make_shared<CastNode>(node, type);
+		}
+		return node;
 	}
 }
 

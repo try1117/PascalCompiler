@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 #include "Token.h"
 //#include "Types.h" // ALERT circular dependencies, need to move FunctionType to another module?
@@ -18,28 +17,51 @@ class SyntaxNode {
 public:
 	std::vector<std::shared_ptr<SyntaxNode>> children;
 	PToken token;
+	PType type;
 
 	SyntaxNode() {}
-	SyntaxNode(PToken token, std::initializer_list<PSyntaxNode> children = {});
-	void print(std::stringstream &output, std::string prefix = "", bool end = true);
+	SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children = {});
+	void print(std::string &output, std::string prefix = "", bool end = true);
 	std::string toString(std::string prefix = "");
 };
 
 class VarNode : public SyntaxNode {
 public:
-	PType type;
-
-	VarNode(PToken token, PType type)
-		: SyntaxNode(token), type(type)
-	{}
+	using SyntaxNode::SyntaxNode;
 };
 
 class UnaryOpNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
 };
 
+class BinaryOpNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
 class NotNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
+};
+
+class ConstNode : public SyntaxNode {
+public:
+	PIdentifierValue value;
+	ConstNode(PToken token, PType type, PIdentifierValue value)
+		: SyntaxNode(token, type), value(value)
+	{
+		token->text = value->toString();
+	}
+};
+
+class TypedConstNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
+class CastNode : public SyntaxNode {
+public:
+	PType newType;
+	CastNode(PSyntaxNode node, PType newType)
+		: SyntaxNode(node->token, node->type, std::initializer_list<PSyntaxNode>({ node })), newType(newType)
+	{}
 };
 
 //class ExprConst : public Expression {

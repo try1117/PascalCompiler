@@ -1,0 +1,11 @@
+program test;
+type
+  int = Integer;
+var
+  a : int;
+type
+  db = Double;
+var
+  b : db;
+begin
+end.

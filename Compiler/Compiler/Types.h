@@ -23,6 +23,7 @@ public:
 	};
 
 	static const std::vector<std::string> categoryName;
+	static const std::set<Category> simpleCategories;
 
 	Category category;
 	Type(Category category = Category::NIL)

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-//#include "SyntaxObject.h"
+#include "SyntaxObject.h"
 #include "Exceptions.h"
 #include "Token.h"
 
@@ -19,9 +19,9 @@ public:
 		VAR_PARAMETER,
 	};
 
-	//PSyntaxNode node;
 	PToken token;
 	PType type;
+	PSyntaxNode value;
 	Category category;
 
 	static const std::vector<std::string> categoryName;
@@ -29,8 +29,8 @@ public:
 	//Symbol(PSyntaxNode node, PType type, Category category)
 	//	: node(node), type(type), category(category)
 	//{}
-	Symbol(PToken token, PType type, Category category)
-		: token(token), type(type), category(category)
+	Symbol(PToken token, PType type, Category category = Category::NIL, PSyntaxNode value = nullptr)
+		: token(token), type(type), category(category), value(value)
 	{}
 };
 
@@ -50,6 +50,7 @@ public:
 	void addVariable(PToken token, PType type);
 	void addVariables(std::vector<PToken> tokens, PType type);
 
+	void addConstant(PToken token, PType type, PSyntaxNode value);
 
 	PSymbol getSymbol(PToken token);
 

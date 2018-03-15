@@ -3,6 +3,7 @@
 #include "SyntaxObject.h"
 #include "Types.h"
 #include "SymbolTable.h"
+#include "Operation.h"
 
 class Parser {
 public:
@@ -26,9 +27,12 @@ private:
 	PSyntaxNode parseFactor();
 
 	PSymbol getSymbol(PToken token);
+	PType getOperationType(PType left, PType right, PToken operation);
+	PSyntaxNode cast(PSyntaxNode node, PType operationType);
+	PSyntaxNode castConstNode(PSyntaxNode node, PType to);
 	PSyntaxNode createOperationNode(PSyntaxNode left, PSyntaxNode right, PToken operation);
-
-	static std::set<TokenType> logicalTypes, exprTypes, termTypes;
+	
+	PIdentifierValue evalOperation(PSyntaxNode left, PSyntaxNode right, PToken operation, PType operationType);
 
 	void parseProgram();
 
@@ -40,7 +44,10 @@ private:
 	void variableDeclarationPart();
 	std::vector<PToken> identifierList();
 
+	bool instanceOfConstNode(PSyntaxNode node);
 	void constDeclarationPart();
+	void requireTypesCompatibility(PType left, PType right);
+	PSyntaxNode typedConstant(PType type);
 
 	PSyntaxNode compoundStatement();
 	PSyntaxNode statementList();

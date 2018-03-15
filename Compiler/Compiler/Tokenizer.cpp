@@ -318,9 +318,8 @@ void Tokenizer::parseWord(char c)
 			}
 			token->text += c;
 		}
-		token->value.string = new char[token->text.length() + 1];
-		strcpy(token->value.string, token->text.c_str());
-		token->stringAllocated = true;
+
+		token->value = std::make_shared<IdentifierValue>(token->text);
 		token->type = (token->text.length() == 1 ? CONST_CHARACTER : CONST_STRING);
 		return;
 	}

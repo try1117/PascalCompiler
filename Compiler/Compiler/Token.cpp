@@ -5,15 +5,8 @@
 #include <memory>
 
 Token::Token(TokenType type, int row, int col, std::string text)
-	: type(type), row(row), col(col), text(text), stringAllocated(false)
+	: type(type), row(row), col(col), text(text), value(nullptr)
 {
-}
-
-Token::~Token()
-{
-	if (stringAllocated) {
-		delete value.string;
-	}
 }
 
 std::string stringPadding(int len, std::string s) {
@@ -36,24 +29,21 @@ void Token::assignValue(std::string text, int base)
 {
 	try {
 		if (type == CONST_INTEGER) {
-			value.integer = std::stoi(text, 0, base);
-			textValue = std::to_string(value.integer);
+			value = std::make_shared<IdentifierValue>(std::stoi(text, 0, base));
+			textValue = std::to_string(value->get.integer);
 		}
 		else if (type == CONST_DOUBLE) {
-			value._double = std::stod(text);
+			value = std::make_shared<IdentifierValue>(std::stod(text));
 			char number[40];
-			sprintf(number, "%.15lf", value._double);
+			sprintf(number, "%.15lf", value->get._double);
 			textValue = number;
 		}
 		else if (type == CONST_CHARACTER) {
 			if (std::stoi(text) < 0 || 255 < std::stoi(text)) {
 				throw LexicalException(row, col, "Illegal char constant");
 			}
-			value.string = new char[2];
-			value.string[0] = char(std::stoi(text));
-			value.string[1] = 0;
-			stringAllocated = true;
-			textValue = value.string;
+			value = std::make_shared<IdentifierValue>(char(std::stoi(text)));
+			textValue = value->get.string;
 		}
 		else {
 			textValue = "";
@@ -160,3 +150,80 @@ std::string TokenName[] = {
 	"OP_GREATER_OR_EQUAL",
 	"OP_DOLLAR",
 };
+
+IdentifierValue::IdentifierValue(int integer)
+	: IdentifierValue()
+{
+	setInteger(integer);
+}
+
+IdentifierValue::IdentifierValue(double _double)
+	: IdentifierValue()
+{
+	setDouble(_double);
+}
+
+IdentifierValue::IdentifierValue(char c)
+	: IdentifierValue()
+{
+	setChar(c);
+}
+
+IdentifierValue::IdentifierValue(std::string s)
+	: IdentifierValue()
+{
+	setString(s);
+}
+
+void IdentifierValue::setInteger(int val)
+{
+	category = INTEGER;
+	releaseMemory();
+	get.integer = val;
+}
+
+void IdentifierValue::setDouble(double val)
+{
+	category = DOUBLE;
+	releaseMemory();
+	get._double = val;
+}
+
+void IdentifierValue::setChar(char val)
+{
+	category = CHAR;
+	setString(std::string({ val }));
+}
+
+void IdentifierValue::setString(std::string val)
+{
+	category = STRING;
+	releaseMemory();
+	get.string = new char[val.length() + 1];
+	stringAllocated = true;
+	strcpy(get.string, val.c_str());
+}
+
+std::string IdentifierValue::toString()
+{
+	if (category == INTEGER) {
+		return std::to_string(get.integer);
+	}
+	else if (category == DOUBLE) {
+		return std::to_string(get._double);
+	}
+	else if (category == CHAR || category == STRING) {
+		return get.string;
+	}
+	else {
+		throw std::exception("Uninitialized IdentifierValue");
+	}
+}
+
+void IdentifierValue::releaseMemory()
+{
+	if (stringAllocated) {
+		delete get.string;
+		stringAllocated = false;
+	}
+}

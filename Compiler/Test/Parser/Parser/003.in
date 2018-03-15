@@ -1,8 +1,8 @@
 program abc;
 var
- a,b,c , d:integer;
- c3 : Char;
- e : Double;
- c1, c2 : Char; 
+  a,b,c , d:integer;
+  c3 : Char;
+  e : Double;
+  c1, c2 : Char; 
 begin
 end.

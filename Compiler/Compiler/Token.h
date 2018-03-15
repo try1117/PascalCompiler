@@ -6,25 +6,55 @@
 enum TokenType;
 extern std::string TokenName[];
 
-struct Token;
+class Token;
 typedef std::shared_ptr<Token> PToken;
 
-struct Token {
+class IdentifierValue {
+public:
+	union Value {
+		int integer;
+		double _double;
+		char *string;
+	} get;
+	bool stringAllocated;
+
+	enum Category {
+		INTEGER, DOUBLE, CHAR, STRING, NIL,
+	} category;
+
+	IdentifierValue() : stringAllocated(false) {}
+	IdentifierValue(int integer);
+	IdentifierValue(double _double);
+	IdentifierValue(char c);
+	IdentifierValue(std::string s);
+
+	void setInteger(int val);
+	void setDouble(double val);
+	void setChar(char val);
+	void setString(std::string val);
+
+	std::string toString();
+
+	~IdentifierValue() {
+		releaseMemory();
+	}
+
+private:
+	void releaseMemory();
+};
+
+typedef std::shared_ptr<IdentifierValue> PIdentifierValue;
+
+class Token {
+public:
 	TokenType type;
 	std::string text;
 	std::string textValue;
 	int row, col;
 
-	union Value {
-		int integer;
-		double _double;
-		char *string;
-	} value;
-
-	bool stringAllocated;
+	PIdentifierValue value;
 
 	Token(TokenType type, int row, int col, std::string text = "");
-	~Token();
 	std::string toString();
 	void assignValue(std::string text, int base);
 };

@@ -1,0 +1,5 @@
+program test;
+const
+  b : double = 1.23 * 456;
+begin
+end.

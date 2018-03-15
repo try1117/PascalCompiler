@@ -1,16 +1,16 @@
 ﻿#include <codecvt>
 #include "SyntaxObject.h"
 
-SyntaxNode::SyntaxNode(PToken token, std::initializer_list<PSyntaxNode> children)
-	: token(token), children(children)
+SyntaxNode::SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children)
+	: token(token), type(type), children(children)
 {
 }
 
-void SyntaxNode::print(std::stringstream &output, std::string prefix, bool end)
+void SyntaxNode::print(std::string &output, std::string prefix, bool end)
 {
 	//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	if (token) {
-		output << prefix + (end ? "--- " : "|-- ") + token->text << std::endl; //converter.from_bytes(token->text) << std::endl;
+		output += prefix + (end ? "--- " : "|-- ") + token->text + "\n"; //converter.from_bytes(token->text) << std::endl;
 	}
 
 	if (children.empty()) {
@@ -26,9 +26,7 @@ void SyntaxNode::print(std::stringstream &output, std::string prefix, bool end)
 
 std::string SyntaxNode::toString(std::string prefix)
 {
-	std::stringstream tmp;
-	print(tmp, prefix, false);
 	std::string res;
-	tmp >> res;
+	print(res, prefix, false);
 	return res;
 }

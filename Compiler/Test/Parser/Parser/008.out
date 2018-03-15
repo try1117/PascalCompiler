@@ -1,0 +1,10 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Const Integer
+   |-- 5
+
+   b : Const Double
+   |-- 5432.100000
+
