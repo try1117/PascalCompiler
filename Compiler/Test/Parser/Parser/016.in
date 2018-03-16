@@ -1,0 +1,13 @@
+program test;
+var
+  a : integer = -5;
+const
+  b : double = -a - 2.0;
+var
+  c : double = a + b;
+  d : double = -'0' + 1.5;
+  e : integer = +#50;
+  f : double = -#57;
+
+begin
+end.

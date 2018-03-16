@@ -30,7 +30,7 @@ public:
 	using SyntaxNode::SyntaxNode;
 };
 
-class UnaryOpNode : public SyntaxNode {
+class UnaryMinusNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
 };
 

@@ -99,7 +99,30 @@ PSyntaxNode Parser::parseFactor()
 		return node;
 	}
 	else if (token->type == OP_MINUS || token->type == OP_PLUS) {
-		return std::make_shared<UnaryOpNode>(token, nullptr, std::initializer_list<PSyntaxNode>({ parseFactor() }));
+		PSyntaxNode factor = parseFactor();
+		std::set<Type::Category> unaryTypes = { Type::INTEGER, Type::DOUBLE, Type::CHAR };
+		if (!unaryTypes.count(factor->type->category)) {
+			throw LexicalException(token->row, token->col, 
+				"Unary operator is not supported for " + Type::categoryName[factor->type->category]);
+		}
+		if (token->type == OP_PLUS) {
+			//return castConstNode(factor, Type::getSimpleType(factor->type->category));
+			return factor;
+		}
+		if (!instanceOfConstNode(factor)) {
+			return std::make_shared<UnaryMinusNode>(token, factor->type, std::initializer_list<PSyntaxNode>({ factor }));
+		}
+
+		auto res = std::static_pointer_cast<ConstNode>(factor);
+		if (res->type->category == Type::DOUBLE) {
+			res->value->setDouble(-res->value->getDouble());
+		}
+		else {
+			res->value->setInteger(-res->value->toInteger());
+			res->type = Type::getSimpleType(Type::INTEGER);
+		}
+		res->token->text = res->value->toString();
+		return res;
 	}
 	else if (token->type == KEYWORD_NOT) {
 		return std::make_shared<NotNode>(token, nullptr, std::initializer_list<PSyntaxNode>({ parseFactor() }));
@@ -107,11 +130,7 @@ PSyntaxNode Parser::parseFactor()
 	else if (token->type == IDENTIFIER) {
 		if (instanceOfConstNode(getSymbol(token)->value)) {
 			// deep copy this symbol, as we don't want to change it in symbol table
-			auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(getSymbol(token)->value));
-			res->value = std::make_shared<IdentifierValue>(*res->value);
-			res->token = std::make_shared<Token>(*res->token);
-			res->type = std::make_shared<Type>(*res->type);
-			return res;
+			return deepCopyConstNode(getSymbol(token)->value);
 		}
 		return std::make_shared<VarNode>(token, getSymbol(token)->type);
 	}
@@ -350,6 +369,15 @@ PType Parser::typeAlias(PToken token)
 	return getSymbol(token)->type;
 }
 
+std::shared_ptr<ConstNode> Parser::deepCopyConstNode(PSyntaxNode node)
+{
+	auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(node));
+	res->value = std::make_shared<IdentifierValue>(*res->value);
+	res->token = std::make_shared<Token>(*res->token);
+	res->type = std::make_shared<Type>(*res->type);
+	return res;
+}
+
 PSyntaxNode Parser::parseConstValue(std::vector<PToken> identifiers, PType type)
 {
 	if (currentTokenType() == OP_EQUAL) {
@@ -430,6 +458,7 @@ void Parser::requireTypesCompatibility(PType left, PType right)
 {
 	std::vector<std::pair<Type::Category, Type::Category>> pairs = {
 		{ Type::DOUBLE, Type::INTEGER },
+		{ Type::INTEGER, Type::CHAR },
 		{ Type::STRING, Type::CHAR },
 	};
 
@@ -440,7 +469,7 @@ void Parser::requireTypesCompatibility(PType left, PType right)
 
 	if (!res) {
 		throw LexicalException(currentToken()->row, currentToken()->col,
-			"Incompatible types, expected " + Type::categoryName[right->category] + " but found " + Type::categoryName[left->category]);
+			"Incompatible types, expected " + Type::categoryName[left->category] + " but found " + Type::categoryName[right->category]);
 	}
 }
 

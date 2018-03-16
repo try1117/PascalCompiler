@@ -1,0 +1,22 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Integer
+   |-- -5
+
+   b : Const Double
+   |-- 3.000000
+
+   c : Double
+   |-- -2.000000
+
+   d : Double
+   |-- -46.500000
+
+   e : Integer
+   |-- 2
+
+   f : Double
+   |-- -57.000000
+
