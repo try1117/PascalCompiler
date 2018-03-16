@@ -1,0 +1,7 @@
+program test;
+const
+  gt : integer = '1' > 48.99;
+  gt2 : integer = '0' > 48.5;
+  eq : integer = '0' = 48.0;
+begin
+end.

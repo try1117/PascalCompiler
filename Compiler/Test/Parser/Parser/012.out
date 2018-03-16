@@ -1,0 +1,31 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   gt : Const Integer
+    |-- 1
+
+   gt2 : Const Integer
+     |-- 0
+
+   eq : Const Integer
+    |-- 1
+
+   lt : Const Integer
+    |-- 0
+
+   le : Const Integer
+    |-- 1
+
+   le2 : Const Integer
+     |-- 1
+
+   le3 : Const Integer
+     |-- 1
+
+   ge : Const Integer
+    |-- 1
+
+   ge2 : Const Integer
+     |-- 0
+

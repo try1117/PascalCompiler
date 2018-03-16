@@ -1,0 +1,12 @@
+program test;
+const
+  gt : integer = '1' > 'qwerty';
+  lt : integer = 'danilov' < 'roman';
+  lt2 : integer = 'danilov' > 'danelov';
+  eq : integer = '123456' = '123456';
+  ne : integer = '123456' <> '12345';
+  ne2 : integer = '123456' <> #48;
+  gt2 : integer = #48 > #49;
+  gt3 : integer = (#48 < '123456') and ('123456' < #50);
+begin
+end.

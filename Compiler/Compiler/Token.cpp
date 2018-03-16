@@ -191,8 +191,8 @@ void IdentifierValue::setDouble(double val)
 
 void IdentifierValue::setChar(char val)
 {
-	category = CHAR;
 	setString(std::string({ val }));
+	category = CHAR;
 }
 
 void IdentifierValue::setString(std::string val)
@@ -202,6 +202,30 @@ void IdentifierValue::setString(std::string val)
 	get.string = new char[val.length() + 1];
 	stringAllocated = true;
 	strcpy(get.string, val.c_str());
+}
+
+int IdentifierValue::getInteger()
+{
+	requireCategory({ INTEGER });
+	return get.integer;
+}
+
+double IdentifierValue::getDouble()
+{
+	requireCategory({ DOUBLE });
+	return get._double;
+}
+
+char IdentifierValue::getChar()
+{
+	requireCategory({ CHAR });
+	return get.string[0];
+}
+
+std::string IdentifierValue::getString()
+{
+	requireCategory({ CHAR, STRING });
+	return get.string;
 }
 
 std::string IdentifierValue::toString()
@@ -218,6 +242,29 @@ std::string IdentifierValue::toString()
 	else {
 		throw std::exception("Uninitialized IdentifierValue");
 	}
+}
+
+int IdentifierValue::toInteger()
+{
+	if (category == INTEGER) return getInteger();
+	else return getChar();
+}
+
+double IdentifierValue::toDouble()
+{
+	if (category == INTEGER) return getInteger();
+	else if (category == CHAR) return getChar();
+	else return getDouble();
+}
+
+void IdentifierValue::requireCategory(std::initializer_list<Category> categories)
+{
+	for (auto it : categories) {
+		if (category == it)
+			return;
+	}
+	throw std::exception("Identifier value exception : Wrong category");
+
 }
 
 void IdentifierValue::releaseMemory()

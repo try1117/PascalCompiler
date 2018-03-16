@@ -1,0 +1,13 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   gt : Const Integer
+    |-- 1
+
+   gt2 : Const Integer
+     |-- 0
+
+   eq : Const Integer
+    |-- 1
+

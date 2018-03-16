@@ -1,0 +1,12 @@
+program test;
+const
+  a : double = 1;
+  gt : integer = 5 > 4;
+  eq : integer = 5 = 4;
+  lt : integer = 5 < 4;
+  le : integer = 5 <= 5;
+  le2 : integer = 4 <= 5;
+  ge : integer = 5 >= 4;
+  ge2 : integer = 4 >= 5;
+begin
+end.

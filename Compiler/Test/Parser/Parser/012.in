@@ -1,0 +1,13 @@
+program test;
+const
+  gt : integer = '1' > 48;
+  gt2 : integer = '0' > 48;
+  eq : integer = '0' = 48;
+  lt : integer = '0' < 48;
+  le : integer = '5' <= 53;
+  le2 : integer = ('a' <= 'd') and ('d' <= 'z');
+  le3 : integer = 'A' <= 'a';
+  ge : integer = ('A' = 65) or ('A' > 'B');
+  ge2 : integer = 'A' > 'B';
+begin
+end.

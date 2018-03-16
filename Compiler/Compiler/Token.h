@@ -33,13 +33,21 @@ public:
 	void setChar(char val);
 	void setString(std::string val);
 
+	int getInteger();
+	double getDouble();
+	char getChar();
+	std::string getString();
+
 	std::string toString();
+	int toInteger();
+	double toDouble();
 
 	~IdentifierValue() {
 		releaseMemory();
 	}
 
 private:
+	void requireCategory(std::initializer_list<Category> categories);
 	void releaseMemory();
 };
 

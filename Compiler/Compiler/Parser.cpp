@@ -112,19 +112,19 @@ PSyntaxNode Parser::parseFactor()
 	}
 	else if (token->type == CONST_INTEGER) {
 		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::INTEGER),
-			std::make_shared<IdentifierValue>(token->value->get.integer));
+			std::make_shared<IdentifierValue>(token->value->getInteger()));
 	}
 	else if (token->type == CONST_DOUBLE) {
 		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::DOUBLE),
-			std::make_shared<IdentifierValue>(token->value->get._double));
+			std::make_shared<IdentifierValue>(token->value->getDouble()));
 	}
 	else if (token->type == CONST_CHARACTER) {
 		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::CHAR),
-			std::make_shared<IdentifierValue>(token->value->get.string));
+			std::make_shared<IdentifierValue>(token->value->getChar()));
 	}
 	else if (token->type == CONST_STRING) {
 		return std::make_shared<ConstNode>(token, Type::getSimpleType(Type::Category::STRING),
-			std::make_shared<IdentifierValue>(token->value->get.string));
+			std::make_shared<IdentifierValue>(token->value->getString()));
 	}
 	else {
 		throw SyntaxException(token->row, token->col, "Expected identifier, constant or expression");
@@ -146,9 +146,9 @@ PType Parser::getOperationType(PType left, PType right, PToken operation)
 	if (Operation::logicalTypes.count(operation->type)) {
 		bool compatibilityTable[4][4] = {
 			/* --- INT, DBL, CHR, STR */
-			/* INT */ { 1, 1, 0, 0 },
-			/* DBL */ { 1, 1, 0, 0 },
-			/* CHR */ { 0, 0, 1, 1 },
+			/* INT */ { 1, 1, 1, 0 },
+			/* DBL */ { 1, 1, 1, 0 },
+			/* CHR */ { 1, 1, 1, 1 },
 			/* STR */ { 0, 0, 1, 1 },
 		};
 
@@ -198,7 +198,8 @@ PSyntaxNode Parser::castConstNode(PSyntaxNode node, PType to)
 	if (node->type->category != to->category) {
 		auto cur = std::static_pointer_cast<ConstNode>(node);
 		if (to->category == Type::Category::DOUBLE) {
-			cur->value->get._double = (double)cur->value->get.integer;
+			cur->value->setDouble((double)cur->value->get.integer);
+			node->token->text = cur->value->toString();
 		}
 		cur->type = Type::getSimpleType(to->category);
 		return cur;
@@ -221,18 +222,17 @@ PSyntaxNode Parser::createOperationNode(PSyntaxNode left, PSyntaxNode right, PTo
 
 		Type::Category lcat = left->type->category;
 		Type::Category rcat = right->type->category;
+		
+		std::set<Type::Category> strings = { Type::CHAR, Type::STRING };
 
-		if (lcat == Type::INTEGER && rcat == Type::INTEGER) {
-			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<int>(lNode->value->get.integer, rNode->value->get.integer, operation));
+		if (strings.count(lcat) && strings.count(rcat)) {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<std::string>(lNode->value->getString(), rNode->value->getString(), operation));
 		}
-		else if (lcat == Type::INTEGER) {
-			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<double>(lNode->value->get.integer, rNode->value->get._double, operation));
-		}
-		else if (rcat == Type::INTEGER) {
-			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<double>(lNode->value->get._double, rNode->value->get.integer, operation));
+		else if (lcat == Type::DOUBLE || rcat == Type::DOUBLE) {
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<double>(lNode->value->toDouble(), rNode->value->toDouble(), operation));
 		}
 		else {
-			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<std::string>(lNode->value->get.string, rNode->value->get.string, operation));
+			value = std::make_shared<IdentifierValue>(Operation::evalLogicalOperation<int>(lNode->value->toInteger(), rNode->value->toInteger(), operation));
 		}
 		return std::make_shared<ConstNode>(operation, operationType, value);
 	}
@@ -362,7 +362,6 @@ std::vector<PToken> Parser::identifierList()
 {
 	std::vector<PToken> res;
 	while (true) {
-		//res.push_back(std::make_shared<VarNode>currentToken(), nullptr));
 		res.push_back(currentToken());
 		requireNext({ SEP_COMMA, OP_COLON });
 		if (currentTokenType() == OP_COLON) {
