@@ -41,6 +41,7 @@ private:
 	PType parseType();
 	PType typeAlias(PToken token);
 
+	PSyntaxNode parseConstValue(std::vector<PToken> identifiers, PType type);
 	void variableDeclarationPart();
 	std::vector<PToken> identifierList();
 

@@ -106,7 +106,12 @@ PSyntaxNode Parser::parseFactor()
 	}
 	else if (token->type == IDENTIFIER) {
 		if (instanceOfConstNode(getSymbol(token)->value)) {
-			return getSymbol(token)->value;
+			// deep copy this symbol, as we don't want to change it in symbol table
+			auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(getSymbol(token)->value));
+			res->value = std::make_shared<IdentifierValue>(*res->value);
+			res->token = std::make_shared<Token>(*res->token);
+			res->type = std::make_shared<Type>(*res->type);
+			return res;
 		}
 		return std::make_shared<VarNode>(token, getSymbol(token)->type);
 	}
@@ -198,7 +203,7 @@ PSyntaxNode Parser::castConstNode(PSyntaxNode node, PType to)
 	if (node->type->category != to->category) {
 		auto cur = std::static_pointer_cast<ConstNode>(node);
 		if (to->category == Type::Category::DOUBLE) {
-			cur->value->setDouble((double)cur->value->get.integer);
+			cur->value->setDouble((double)cur->value->getInteger());
 			node->token->text = cur->value->toString();
 		}
 		cur->type = Type::getSimpleType(to->category);
@@ -345,14 +350,26 @@ PType Parser::typeAlias(PToken token)
 	return getSymbol(token)->type;
 }
 
+PSyntaxNode Parser::parseConstValue(std::vector<PToken> identifiers, PType type)
+{
+	if (currentTokenType() == OP_EQUAL) {
+		goToNextToken();
+		if (identifiers.size() > 1) {
+			throw LexicalException(currentToken()->row, currentToken()->col, "Only one variable can be initialized");
+		}
+		return typedConstant(type);
+	}
+	return nullptr;
+}
+
 void Parser::variableDeclarationPart()
 {
 	do {
 		requireCurrent({ IDENTIFIER });
 		auto identifiers = identifierList();
 		PType type = parseType();
-		// TODO: initialization
-		tables.back()->addVariables(identifiers, type);
+		PSyntaxNode value = parseConstValue(identifiers, type);
+		tables.back()->addVariables(identifiers, type, value);
 		requireCurrent({ SEP_SEMICOLON });
 		goToNextToken();
 	} while (currentTokenType() == IDENTIFIER);

@@ -1,0 +1,10 @@
+program test;
+var
+  a : integer = 5;
+const
+  b : double = a - 2.0;
+var
+  c : double = a + b;
+
+begin
+end.

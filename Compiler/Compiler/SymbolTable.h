@@ -26,9 +26,6 @@ public:
 
 	static const std::vector<std::string> categoryName;
 
-	//Symbol(PSyntaxNode node, PType type, Category category)
-	//	: node(node), type(type), category(category)
-	//{}
 	Symbol(PToken token, PType type, Category category = Category::NIL, PSyntaxNode value = nullptr)
 		: token(token), type(type), category(category), value(value)
 	{}
@@ -44,11 +41,9 @@ public:
 
 	void checkDuplication(PToken token);
 	void addType(PToken token, PType type);
-	//void addVariable(PSyntaxNode identifier, PType type);
-	//void addVariables(std::vector<PSyntaxNode> identifiers, PType type);
 	
-	void addVariable(PToken token, PType type);
-	void addVariables(std::vector<PToken> tokens, PType type);
+	void addVariable(PToken token, PType type, PSyntaxNode value = nullptr);
+	void addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value = nullptr);
 
 	void addConstant(PToken token, PType type, PSyntaxNode value);
 

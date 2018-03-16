@@ -25,17 +25,17 @@ void SymbolTable::addType(PToken token, PType type)
 	addSymbol(sym);
 }
 
-void SymbolTable::addVariable(PToken token, PType type)
+void SymbolTable::addVariable(PToken token, PType type, PSyntaxNode value)
 {
 	checkDuplication(token);
-	PSymbol sym = std::make_shared<Symbol>(token, type, Symbol::Category::NIL);
+	PSymbol sym = std::make_shared<Symbol>(token, type, Symbol::Category::NIL, value);
 	addSymbol(sym);
 }
 
-void SymbolTable::addVariables(std::vector<PToken> tokens, PType type)
+void SymbolTable::addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value)
 {
 	for (auto it : tokens) {
-		addVariable(it, type);
+		addVariable(it, type, value);
 	}
 }
 
