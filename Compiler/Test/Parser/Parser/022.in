@@ -1,0 +1,17 @@
+program test;
+type
+  myarr = array [11..12] of string;
+var
+  a : record
+    a : integer;
+    b : double;
+    c : array [-5..5] of
+      record
+        a : char;
+        abc : array [-100..-98] of array [5..6] of myarr;
+      end;
+    d : string;
+  end;
+
+begin
+end.

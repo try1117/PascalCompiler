@@ -1,0 +1,10 @@
+program test;
+var
+  a: record
+    name: string;
+    age: integer;
+    height: double;
+  end = (name: 'Alice'; age: 17; height: 5.6);
+
+begin
+end.

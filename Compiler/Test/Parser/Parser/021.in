@@ -1,0 +1,10 @@
+program test;
+var
+  a : record
+    a : integer;
+    b : double;
+    c : array [-5..5] of char;
+  end;
+
+begin
+end.

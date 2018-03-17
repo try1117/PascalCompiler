@@ -1,0 +1,12 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Array [3, 7] of Integer
+   |-- Array
+   |        |-- 10
+   |        |-- 11
+   |        |-- 22
+   |        |-- 33
+   |        --- 44
+

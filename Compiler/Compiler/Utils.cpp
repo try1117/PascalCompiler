@@ -7,7 +7,14 @@ std::string lowerString(std::string s)
 	return s;
 }
 
-int lastLineWidth(std::string s)
+void increaseIndent(std::string &s, int cnt)
 {
-	return 0;
+	s += std::string(cnt, ' ');
+}
+
+void decreaseIndent(std::string &s, int cnt)
+{
+	if (s.length() >= cnt) {
+		s.erase(s.length() - cnt, cnt);
+	}
 }

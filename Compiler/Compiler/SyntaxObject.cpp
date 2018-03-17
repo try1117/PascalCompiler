@@ -1,5 +1,6 @@
 ﻿#include <codecvt>
 #include "SyntaxObject.h"
+#include "Utils.h"
 
 SyntaxNode::SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children)
 	: token(token), type(type), children(children)
@@ -17,10 +18,18 @@ void SyntaxNode::print(std::string &output, std::string prefix, bool end)
 		return;
 	}
 
-	children[0]->print(output, prefix + (end ? "    " : "|   "), false);
+	prefix += (end ? "    " : "|   ");
+	if (token) {
+		increaseIndent(prefix, token->text.length());
+	}
+	children[0]->print(output, prefix, false);
 
 	for (int i = 1; i < children.size(); ++i) {
-		children[i]->print(output, prefix + (end ? "    " : "|   "), i == (int)children.size() - 1);
+		children[i]->print(output, prefix, i == (int)children.size() - 1);
+	}
+
+	if (token) {
+		decreaseIndent(prefix, token->text.length());
 	}
 }
 

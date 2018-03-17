@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "Token.h"
 //#include "Types.h" // ALERT circular dependencies, need to move FunctionType to another module?
@@ -52,8 +53,14 @@ public:
 	}
 };
 
+typedef std::shared_ptr<ConstNode> PConstNode;
+
 class TypedConstNode : public SyntaxNode {
-	using SyntaxNode::SyntaxNode;
+public:
+	PType type;
+	TypedConstNode(PType type, std::string name)
+		: SyntaxNode(std::make_shared<Token>(IDENTIFIER, 0, 0, name), type)
+	{}
 };
 
 class CastNode : public SyntaxNode {
@@ -63,23 +70,3 @@ public:
 		: SyntaxNode(node->token, node->type, std::initializer_list<PSyntaxNode>({ node })), newType(newType)
 	{}
 };
-
-//class ExprConst : public Expression {
-//	using Expression::Expression;
-//};
-//
-//class ExprOp : public Expression {
-//	using Expression::Expression;
-//};
-//
-//class ExprUnaryOp : public ExprOp {
-//	using ExprOp::ExprOp;
-//};
-//
-//class ExprBinaryOp : public ExprOp {
-//	using ExprOp::ExprOp;
-//};
-//
-//class ExprFunc : public Expression {
-//	using Expression::Expression;
-//};

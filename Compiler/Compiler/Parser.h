@@ -41,6 +41,9 @@ private:
 	PType parseType();
 	PType typeAlias(PToken token);
 
+	PType parseArrayType();
+	PType parseRecordType();
+
 	std::shared_ptr<ConstNode> deepCopyConstNode(PSyntaxNode node);
 	PSyntaxNode parseConstValue(std::vector<PToken> identifiers, PType type);
 	void variableDeclarationPart();

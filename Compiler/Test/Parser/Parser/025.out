@@ -1,0 +1,14 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Record
+      name : String
+      age : Integer
+      height : Double
+   end
+   |-- Record
+   |         |-- Alice
+   |         |-- 17
+   |         --- 5.600000
+

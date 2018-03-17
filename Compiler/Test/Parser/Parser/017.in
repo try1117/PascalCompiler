@@ -1,0 +1,10 @@
+program test;
+var
+  a : integer = not 0;
+const
+  b : double = not(a - 1);
+  c : integer = not a - 5;
+  d : char = a + -1 + 5 + '0' + 2;
+
+begin
+end.

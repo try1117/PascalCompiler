@@ -1,0 +1,16 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Integer
+   |-- 1
+
+   b : Const Double
+   |-- 1.000000
+
+   c : Const Integer
+   |-- -5
+
+   d : Const Char
+   |-- 7
+

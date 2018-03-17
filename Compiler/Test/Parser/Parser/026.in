@@ -1,0 +1,26 @@
+program test;
+var
+  intvar: integer;
+  cc: integer;
+  abaca: record
+    caption: string;
+    width, height: integer;
+    contacts: array [1..3] of record
+      name: string;
+      phone: integer;
+    end;
+    additional: char;
+  end = (
+    caption: 'Tesla';
+    width: 539;
+    height: 846;
+    contacts: (
+      (name: 'Mark'; phone: 876425),
+      (name: 'Andrew'; phone: 2232237),
+      (name: 'Michael'; phone: 776776)
+    );
+    additional: #50 div 2 + 26
+  );
+
+begin
+end.

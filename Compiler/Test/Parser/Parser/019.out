@@ -1,0 +1,5 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : Array [1, 10] of Integer

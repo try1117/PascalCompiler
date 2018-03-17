@@ -1,0 +1,16 @@
+test : function()
+   resultType : Nil
+   
+Declarations:
+   a : String
+   |-- aba
+
+   b : Const String
+   |-- qweraba
+
+   c : Const Integer
+   |-- 1
+
+   d : Const String
+   |-- danilov
+

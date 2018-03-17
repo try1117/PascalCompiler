@@ -103,10 +103,9 @@ PSyntaxNode Parser::parseFactor()
 		std::set<Type::Category> unaryTypes = { Type::INTEGER, Type::DOUBLE, Type::CHAR };
 		if (!unaryTypes.count(factor->type->category)) {
 			throw LexicalException(token->row, token->col, 
-				"Unary operator is not supported for " + Type::categoryName[factor->type->category]);
+				"Unary plus and minus are not supported for type " + Type::categoryName[factor->type->category]);
 		}
 		if (token->type == OP_PLUS) {
-			//return castConstNode(factor, Type::getSimpleType(factor->type->category));
 			return factor;
 		}
 		if (!instanceOfConstNode(factor)) {
@@ -125,7 +124,19 @@ PSyntaxNode Parser::parseFactor()
 		return res;
 	}
 	else if (token->type == KEYWORD_NOT) {
-		return std::make_shared<NotNode>(token, nullptr, std::initializer_list<PSyntaxNode>({ parseFactor() }));
+		PSyntaxNode factor = parseFactor();
+		if (factor->type->category != Type::INTEGER && factor->type->category != Type::CHAR) {
+			throw LexicalException(token->row, token->col,
+				"Operator \"not\" is not supported for type " + Type::categoryName[factor->type->category]);
+		}
+		if (!instanceOfConstNode(factor)) {
+			return std::make_shared<NotNode>(token, factor->type, std::initializer_list<PSyntaxNode>({ factor }));
+		}
+
+		auto res = std::static_pointer_cast<ConstNode>(factor);
+		res->value->setInteger(!res->value->toInteger());
+		res->token->text = res->value->toString();
+		return res;
 	}
 	else if (token->type == IDENTIFIER) {
 		if (instanceOfConstNode(getSymbol(token)->value)) {
@@ -167,6 +178,9 @@ PSymbol Parser::getSymbol(PToken token)
 
 PType Parser::getOperationType(PType left, PType right, PToken operation)
 {
+	std::set<Type::Category> numbers = { Type::Category::INTEGER, Type::Category::DOUBLE, Type::Category::CHAR };
+	std::set<Type::Category> integers = { Type::Category::INTEGER, Type::Category::CHAR };
+
 	if (Operation::logicalTypes.count(operation->type)) {
 		bool compatibilityTable[4][4] = {
 			/* --- INT, DBL, CHR, STR */
@@ -181,14 +195,16 @@ PType Parser::getOperationType(PType left, PType right, PToken operation)
 		}
 	}
 	else if (Operation::integerOperationTypes.count(operation->type)) {
-		if (left->category == Type::Category::INTEGER && right->category == Type::Category::INTEGER) {
+		if (integers.count(left->category) && integers.count(right->category)) {
 			return Type::getSimpleType(Type::Category::INTEGER);
 		}
 	}
 	else if (Operation::simpleArithmeticTypes.count(operation->type)) {
-		std::set<Type::Category> numbers = { Type::Category::INTEGER, Type::Category::DOUBLE };
+		std::set<Type::Category> numbers = { Type::Category::INTEGER, Type::Category::DOUBLE, Type::Category::CHAR };
+		std::set<Type::Category> integers = { Type::Category::INTEGER, Type::Category::CHAR };
+		
 		if (numbers.count(left->category) && numbers.count(right->category)) {
-			if (left->category == Type::Category::INTEGER && right->category == Type::Category::INTEGER) {
+			if (integers.count(left->category) && integers.count(right->category)) {
 				return Type::getSimpleType(Type::Category::INTEGER);
 			}
 			else {
@@ -223,9 +239,16 @@ PSyntaxNode Parser::castConstNode(PSyntaxNode node, PType to)
 		auto cur = std::static_pointer_cast<ConstNode>(node);
 		if (to->category == Type::Category::DOUBLE) {
 			cur->value->setDouble((double)cur->value->getInteger());
-			node->token->text = cur->value->toString();
 		}
+		else if (to->category == Type::Category::INTEGER) {
+			cur->value->setInteger(cur->value->toDouble());
+		}
+		else if (to->category == Type::Category::CHAR) {
+			cur->value->setChar(cur->value->toInteger());
+		}
+
 		cur->type = Type::getSimpleType(to->category);
+		node->token->text = cur->value->toString();
 		return cur;
 	}
 	return node;
@@ -276,14 +299,14 @@ PIdentifierValue Parser::evalOperation(PSyntaxNode left, PSyntaxNode right, PTok
 	auto rightNode = std::static_pointer_cast<ConstNode>(right);
 	
 	if (operationType->category == Type::Category::INTEGER) {
-		return std::make_shared<IdentifierValue>(Operation::evalIntegers(leftNode->value->get.integer, rightNode->value->get.integer, operation));
+		return std::make_shared<IdentifierValue>(Operation::evalIntegers(leftNode->value->getInteger(), rightNode->value->getInteger(), operation));
 	}
 	else if (operationType->category == Type::Category::DOUBLE) {
-		return std::make_shared<IdentifierValue>(Operation::evalDoubles(leftNode->value->get._double, rightNode->value->get._double, operation));
+		return std::make_shared<IdentifierValue>(Operation::evalDoubles(leftNode->value->getDouble(), rightNode->value->getDouble(), operation));
 	}
 	// char or string
 	else {
-		return std::make_shared<IdentifierValue>(Operation::evalStrings(leftNode->value->get.string, rightNode->value->get.string, operation));
+		return std::make_shared<IdentifierValue>(Operation::evalStrings(leftNode->value->getString(), rightNode->value->getString(), operation));
 	}
 }
 
@@ -356,6 +379,12 @@ PType Parser::parseType()
 	if (token->type == IDENTIFIER) {
 		return typeAlias(token);
 	}
+	else if (token->type == KEYWORD_ARRAY) {
+		return parseArrayType();
+	}
+	else if (token->type == KEYWORD_RECORD) {
+		return parseRecordType();
+	}
 	else if (simpleCategories.count(token->type)) {
 		return Type::getSimpleType(simpleCategories[token->type]);
 	}
@@ -369,10 +398,49 @@ PType Parser::typeAlias(PToken token)
 	return getSymbol(token)->type;
 }
 
+PType Parser::parseArrayType()
+{
+	requireCurrent({ SEP_BRACKET_SQUARE_LEFT });
+	goToNextToken();
+
+	PSyntaxNode left = parseExpr();
+	if (left->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
+		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[left->type->category]);
+	}
+	requireCurrent({ SEP_DOUBLE_DOT });
+	goToNextToken();
+
+	PSyntaxNode right = parseExpr();
+	if (right->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
+		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[right->type->category]);
+	}
+	requireCurrent({ SEP_BRACKET_SQUARE_RIGHT });
+	goToNextToken();
+
+	requireCurrent({ KEYWORD_OF });
+	goToNextToken();
+	return std::make_shared<ArrayType>(parseType(), std::static_pointer_cast<ConstNode>(left), std::static_pointer_cast<ConstNode>(right));
+}
+
+PType Parser::parseRecordType()
+{
+	PSymbolTable fields = std::make_shared<SymbolTable>();
+	while (currentTokenType() == IDENTIFIER) {
+		auto list = identifierList();
+		fields->addVariables(list, parseType(), nullptr);
+		requireCurrent({ SEP_SEMICOLON });
+		goToNextToken();
+	}
+	requireCurrent({ KEYWORD_END });
+	goToNextToken();
+	return std::make_shared<RecordType>(fields);
+}
+
 std::shared_ptr<ConstNode> Parser::deepCopyConstNode(PSyntaxNode node)
 {
 	auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(node));
 	res->value = std::make_shared<IdentifierValue>(*res->value);
+	res->value->get = res->value->cloneValue();
 	res->token = std::make_shared<Token>(*res->token);
 	res->type = std::make_shared<Type>(*res->type);
 	return res;
@@ -459,6 +527,7 @@ void Parser::requireTypesCompatibility(PType left, PType right)
 	std::vector<std::pair<Type::Category, Type::Category>> pairs = {
 		{ Type::DOUBLE, Type::INTEGER },
 		{ Type::INTEGER, Type::CHAR },
+		{ Type::CHAR, Type::INTEGER },
 		{ Type::STRING, Type::CHAR },
 	};
 
@@ -484,6 +553,54 @@ PSyntaxNode Parser::typedConstant(PType type)
 		if (node->type->category != type->category) {
 			return std::make_shared<CastNode>(node, type);
 		}
+		return node;
+	}
+	else if (type->category == Type::ARRAY) {
+		auto arrayType = std::static_pointer_cast<ArrayType>(type);
+		PSyntaxNode node = std::make_shared<TypedConstNode>(type, "Array");
+		int left = arrayType->left->value->getInteger();
+		int right = arrayType->right->value->getInteger();
+		requireCurrent({ SEP_BRACKET_LEFT });
+		goToNextToken();
+		
+		for (int i = left; i <= right; ++i) {
+			node->children.push_back(typedConstant(arrayType->elementType));
+			if (i < right) {
+				requireCurrent({ SEP_COMMA });
+				goToNextToken();
+			}
+		}
+		requireCurrent({ SEP_BRACKET_RIGHT });
+		goToNextToken();
+		return node;
+	}
+	else if (type->category == Type::RECORD) {
+		requireCurrent({ SEP_BRACKET_LEFT });
+		goToNextToken();
+		auto recordType = std::static_pointer_cast<RecordType>(type);
+		PSyntaxNode node = std::make_shared<TypedConstNode>(type, "Record");
+		
+		for (int i = 0; i < recordType->fields->symbolsArray.size(); ++i) {
+			PToken token = currentToken();
+			requireCurrent({ IDENTIFIER });
+			goToNextToken();
+			if (!recordType->fields->symbolsMap.count(token->text)) {
+				throw LexicalException(token->row, token->col, "Unknown record field identifier " + token->text);
+			}
+			if (recordType->fields->symbolsArray[i]->token->text != token->text) {
+				throw LexicalException(token->row, token->col, "Illegal initialization order");
+			}
+
+			requireCurrent({ OP_COLON });
+			goToNextToken();
+			node->children.push_back(typedConstant(recordType->fields->symbolsArray[i]->type));
+			if (i < (int)recordType->fields->symbolsArray.size() - 1) {
+				requireCurrent({ SEP_SEMICOLON });
+				goToNextToken();
+			}
+		}
+		requireCurrent({ SEP_BRACKET_RIGHT });
+		goToNextToken();
 		return node;
 	}
 }

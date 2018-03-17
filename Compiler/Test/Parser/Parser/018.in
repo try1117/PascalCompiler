@@ -1,0 +1,10 @@
+program test;
+var
+  a : string = 'aba';
+const
+  b : string = 'qwer' + a;
+  c : integer = b = 'qweraba';
+  d : string = 'd' + 'ani' + 'lov';
+
+begin
+end.

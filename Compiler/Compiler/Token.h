@@ -42,6 +42,8 @@ public:
 	int toInteger();
 	double toDouble();
 
+	IdentifierValue::Value cloneValue();
+	
 	~IdentifierValue() {
 		releaseMemory();
 	}

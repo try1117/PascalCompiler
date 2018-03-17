@@ -257,6 +257,17 @@ double IdentifierValue::toDouble()
 	else return getDouble();
 }
 
+IdentifierValue::Value IdentifierValue::cloneValue()
+{
+	if (category == CHAR || category == STRING) {
+		Value res;
+		res.string = new char[strlen(get.string) + 1];
+		strcpy(res.string, get.string);
+		return res;
+	}
+	return get;
+}
+
 void IdentifierValue::requireCategory(std::initializer_list<Category> categories)
 {
 	for (auto it : categories) {

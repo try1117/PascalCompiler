@@ -49,7 +49,7 @@ std::string FunctionType::toString()
 {
 	std::string res;
 	res += indent + name + " : function()" + "\n";
-	indent += "   ";
+	increaseIndent(indent);
 	res += indent + "resultType : " + returnType->toString() + "\n";
 	
 	res += indent + "\nDeclarations:\n";
@@ -60,7 +60,7 @@ std::string FunctionType::toString()
 		}
 		else {
 			std::string symcat = Symbol::categoryName[it->category];
-			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + Type::categoryName[it->type->category] + "\n";
+			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + it->type->toString() + "\n";
 			std::string strValue;
 			if (it->value != nullptr) {
 				strValue = it->value->toString(std::string((indent + it->token->text).length() - 1, ' '));
@@ -72,5 +72,32 @@ std::string FunctionType::toString()
 	if (body != nullptr) {
 		res += body->toString(indent);
 	}
+	decreaseIndent(indent);
+	return res;
+}
+
+std::string ArrayType::toString()
+{
+	std::string res;
+	std::shared_ptr<ArrayType> cur = std::make_shared<ArrayType>(*this);
+	while (cur->category == Type::Category::ARRAY) {
+		res += "Array [" + cur->left->token->text + ", " + cur->right->token->text + "] of ";
+		if (cur->elementType->category != Type::Category::ARRAY) {
+			break;
+		}
+		cur = std::static_pointer_cast<ArrayType>(cur->elementType);
+	}
+	return res + cur->elementType->toString();
+}
+
+std::string RecordType::toString()
+{
+	std::string res = "Record\n";
+	increaseIndent(indent);
+	for (auto it : fields->symbolsArray) {
+		res += indent + it->token->text + " : " + it->type->toString() + "\n";
+	}
+	decreaseIndent(indent);
+	res += indent + "end";
 	return res;
 }

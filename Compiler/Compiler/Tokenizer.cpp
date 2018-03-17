@@ -255,7 +255,9 @@ void Tokenizer::parseNumber(char c)
 			else if (c == '.') {
 				token->text.pop_back();
 				reader.symbolRollback();
+				reader.symbolRollback();
 				state = NS_BEFORE_DOT;
+				token->type = CONST_INTEGER;
 				break;
 			}
 			else {

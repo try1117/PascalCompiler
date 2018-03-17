@@ -1,0 +1,10 @@
+program test;
+var
+  a : array[10..12] of array[3..7] of integer = (
+    (10, 11, 22, 33, 44),
+    (1, 2, 3, 4, 5),
+    (8, 8, 7, 7, 6)
+  );
+
+begin
+end.
