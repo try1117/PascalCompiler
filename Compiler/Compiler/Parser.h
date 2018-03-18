@@ -19,7 +19,7 @@ private:
 	PToken currentToken();
 	TokenType currentTokenType();
 	void requireCurrent(std::initializer_list<TokenType> types);
-	void requireNext(std::initializer_list<TokenType> types);
+	void requireThenNext(std::initializer_list<TokenType> types);
 
 	PSyntaxNode parseLogical();
 	PSyntaxNode parseExpr();
@@ -53,6 +53,8 @@ private:
 	void constDeclarationPart();
 	void requireTypesCompatibility(PType left, PType right);
 	PSyntaxNode typedConstant(PType type);
+
+	void functionDeclarationPart(bool isFunction);
 
 	PSyntaxNode compoundStatement();
 	PSyntaxNode statementList();

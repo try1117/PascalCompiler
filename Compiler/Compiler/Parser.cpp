@@ -39,10 +39,10 @@ void Parser::requireCurrent(std::initializer_list<TokenType> types)
 		"Expected " + res + " but found " + currentToken()->text);
 }
 
-void Parser::requireNext(std::initializer_list<TokenType> types)
+void Parser::requireThenNext(std::initializer_list<TokenType> types)
 {
-	goToNextToken();
 	requireCurrent(types);
+	goToNextToken();
 }
 
 PSyntaxNode Parser::parseLogical()
@@ -94,8 +94,7 @@ PSyntaxNode Parser::parseFactor()
 
 	if (token->type == SEP_BRACKET_LEFT) {
 		auto node = parseLogical();
-		requireCurrent({ SEP_BRACKET_RIGHT });
-		goToNextToken();
+		requireThenNext({ SEP_BRACKET_RIGHT });
 		return node;
 	}
 	else if (token->type == OP_MINUS || token->type == OP_PLUS) {
@@ -322,11 +321,12 @@ PType Parser::parse()
 
 void Parser::parseProgram()
 {
-	requireNext({ KEYWORD_PROGRAM });
-	requireNext({ IDENTIFIER });
-	programName = currentToken()->text;
-	requireNext({ SEP_SEMICOLON });
 	goToNextToken();
+	requireThenNext({ KEYWORD_PROGRAM });
+	requireCurrent({ IDENTIFIER });
+	programName = currentToken()->text;
+	goToNextToken();
+	requireThenNext({ SEP_SEMICOLON });
 }
 
 void Parser::declarationPart()
@@ -344,6 +344,14 @@ void Parser::declarationPart()
 			goToNextToken();
 			constDeclarationPart();
 		}
+		else if (currentTokenType() == KEYWORD_FUNCTION) {
+			goToNextToken();
+			functionDeclarationPart(true);
+		}
+		else if (currentTokenType() == KEYWORD_PROCEDURE) {
+			goToNextToken();
+			functionDeclarationPart(false);
+		}
 		else {
 			return;
 		}
@@ -355,12 +363,11 @@ void Parser::typeDeclarationPart()
 	do {
 		requireCurrent({ IDENTIFIER });
 		auto identifier = currentToken();
-		requireNext({ OP_EQUAL });
 		goToNextToken();
+		requireThenNext({ OP_EQUAL });
 		PType type = parseType();
 		tables.back()->addType(identifier, type);
-		requireCurrent({ SEP_SEMICOLON });
-		goToNextToken();
+		requireThenNext({ SEP_SEMICOLON });
 	} while (currentTokenType() == IDENTIFIER);
 }
 
@@ -400,25 +407,21 @@ PType Parser::typeAlias(PToken token)
 
 PType Parser::parseArrayType()
 {
-	requireCurrent({ SEP_BRACKET_SQUARE_LEFT });
-	goToNextToken();
+	requireThenNext({ SEP_BRACKET_SQUARE_LEFT });
 
 	PSyntaxNode left = parseExpr();
 	if (left->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
 		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[left->type->category]);
 	}
-	requireCurrent({ SEP_DOUBLE_DOT });
-	goToNextToken();
+	requireThenNext({ SEP_DOUBLE_DOT });
 
 	PSyntaxNode right = parseExpr();
 	if (right->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
 		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[right->type->category]);
 	}
-	requireCurrent({ SEP_BRACKET_SQUARE_RIGHT });
-	goToNextToken();
+	requireThenNext({ SEP_BRACKET_SQUARE_RIGHT });
 
-	requireCurrent({ KEYWORD_OF });
-	goToNextToken();
+	requireThenNext({ KEYWORD_OF });
 	return std::make_shared<ArrayType>(parseType(), std::static_pointer_cast<ConstNode>(left), std::static_pointer_cast<ConstNode>(right));
 }
 
@@ -428,11 +431,9 @@ PType Parser::parseRecordType()
 	while (currentTokenType() == IDENTIFIER) {
 		auto list = identifierList();
 		fields->addVariables(list, parseType(), nullptr);
-		requireCurrent({ SEP_SEMICOLON });
-		goToNextToken();
+		requireThenNext({ SEP_SEMICOLON });
 	}
-	requireCurrent({ KEYWORD_END });
-	goToNextToken();
+	requireThenNext({ KEYWORD_END });
 	return std::make_shared<RecordType>(fields);
 }
 
@@ -466,8 +467,7 @@ void Parser::variableDeclarationPart()
 		PType type = parseType();
 		PSyntaxNode value = parseConstValue(identifiers, type);
 		tables.back()->addVariables(identifiers, type, value);
-		requireCurrent({ SEP_SEMICOLON });
-		goToNextToken();
+		requireThenNext({ SEP_SEMICOLON });
 	} while (currentTokenType() == IDENTIFIER);
 }
 
@@ -476,7 +476,8 @@ std::vector<PToken> Parser::identifierList()
 	std::vector<PToken> res;
 	while (true) {
 		res.push_back(currentToken());
-		requireNext({ SEP_COMMA, OP_COLON });
+		goToNextToken();
+		requireCurrent({ SEP_COMMA, OP_COLON });
 		if (currentTokenType() == OP_COLON) {
 			goToNextToken();
 			break;
@@ -489,7 +490,6 @@ std::vector<PToken> Parser::identifierList()
 bool Parser::instanceOfConstNode(PSyntaxNode node)
 {
 	return std::static_pointer_cast<ConstNode>(node) != nullptr;
-	//return typeid(node) == typeid(ConstNode);
 }
 
 void Parser::constDeclarationPart()
@@ -497,7 +497,8 @@ void Parser::constDeclarationPart()
 	do {
 		requireCurrent({ IDENTIFIER });
 		PToken token = currentToken();
-		requireNext({ OP_EQUAL, OP_COLON });
+		goToNextToken();
+		requireCurrent({ OP_EQUAL, OP_COLON });
 
 		// untyped constant
 		if (currentTokenType() == OP_EQUAL) {
@@ -512,13 +513,11 @@ void Parser::constDeclarationPart()
 		else if (currentTokenType() == OP_COLON) {
 			goToNextToken();
 			PType type = parseType();
-			requireCurrent({ OP_EQUAL });
-			goToNextToken();
+			requireThenNext({ OP_EQUAL });
 			PSyntaxNode value = typedConstant(type);
 			tables.back()->addConstant(token, type, value);
 		}
-		requireCurrent({ SEP_SEMICOLON });
-		goToNextToken();
+		requireThenNext({ SEP_SEMICOLON });
 	} while (currentTokenType() == IDENTIFIER);
 }
 
@@ -560,30 +559,25 @@ PSyntaxNode Parser::typedConstant(PType type)
 		PSyntaxNode node = std::make_shared<TypedConstNode>(type, "Array");
 		int left = arrayType->left->value->getInteger();
 		int right = arrayType->right->value->getInteger();
-		requireCurrent({ SEP_BRACKET_LEFT });
-		goToNextToken();
+		requireThenNext({ SEP_BRACKET_LEFT });
 		
 		for (int i = left; i <= right; ++i) {
 			node->children.push_back(typedConstant(arrayType->elementType));
 			if (i < right) {
-				requireCurrent({ SEP_COMMA });
-				goToNextToken();
+				requireThenNext({ SEP_COMMA });
 			}
 		}
-		requireCurrent({ SEP_BRACKET_RIGHT });
-		goToNextToken();
+		requireThenNext({ SEP_BRACKET_RIGHT });
 		return node;
 	}
 	else if (type->category == Type::RECORD) {
-		requireCurrent({ SEP_BRACKET_LEFT });
-		goToNextToken();
+		requireThenNext({ SEP_BRACKET_LEFT });
 		auto recordType = std::static_pointer_cast<RecordType>(type);
 		PSyntaxNode node = std::make_shared<TypedConstNode>(type, "Record");
 		
 		for (int i = 0; i < recordType->fields->symbolsArray.size(); ++i) {
 			PToken token = currentToken();
-			requireCurrent({ IDENTIFIER });
-			goToNextToken();
+			requireThenNext({ IDENTIFIER });
 			if (!recordType->fields->symbolsMap.count(token->text)) {
 				throw LexicalException(token->row, token->col, "Unknown record field identifier " + token->text);
 			}
@@ -591,26 +585,27 @@ PSyntaxNode Parser::typedConstant(PType type)
 				throw LexicalException(token->row, token->col, "Illegal initialization order");
 			}
 
-			requireCurrent({ OP_COLON });
-			goToNextToken();
+			requireThenNext({ OP_COLON });
 			node->children.push_back(typedConstant(recordType->fields->symbolsArray[i]->type));
 			if (i < (int)recordType->fields->symbolsArray.size() - 1) {
-				requireCurrent({ SEP_SEMICOLON });
-				goToNextToken();
+				requireThenNext({ SEP_SEMICOLON });
 			}
 		}
-		requireCurrent({ SEP_BRACKET_RIGHT });
-		goToNextToken();
+		requireThenNext({ SEP_BRACKET_RIGHT });
 		return node;
 	}
+}
+
+void Parser::functionDeclarationPart(bool isFunction)
+{
+
 }
 
 PSyntaxNode Parser::compoundStatement()
 {
 	requireCurrent({ KEYWORD_BEGIN });
 	PSyntaxNode statement = statementList();
-	requireCurrent({ KEYWORD_END });
-	goToNextToken();
+	requireThenNext({ KEYWORD_END });
 	return statement;
 }
 
