@@ -1,0 +1,38 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   abc : function(
+      a : Integer
+   ) resultType : Integer
+
+   abc declarations:
+      myArr : Type Array [-1, 1] of Double
+
+      c : Const Array [-1, 1] of Double
+      |-- Array
+      |        |-- 12.000000
+      |        |-- 22.000000
+      |        --- 32.000000
+
+      v : Integer
+      |-- 15
+
+   proc : function(
+      name : Var String
+      surname : Var String
+      a : Integer
+      |-- 123
+
+      b : Const Double
+      |-- 2.000000
+
+   ) resultType : Nil
+
+   proc declarations:
+      prInt : Char
+          |-- Y
+
+      s : String
+      |-- abaca
+

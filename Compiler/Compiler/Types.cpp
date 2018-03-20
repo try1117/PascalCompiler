@@ -40,25 +40,14 @@ std::string Type::toString()
 	return categoryName[category];
 }
 
-FunctionType::FunctionType(PSymbolTable declarations, PType returnType, PSyntaxNode body, std::string name)
-	: declarations(declarations), returnType(returnType), body(body), name(name)
-{
-}
-
 std::string FunctionType::toString()
 {
 	std::string res;
-	res += indent + name + " : function()" + "\n";
-	increaseIndent(indent);
-	res += indent + "resultType : " + returnType->toString() + "\n";
-	
-	res += indent + "\nDeclarations:\n";
+	res += indent + name + " : function(" + (parameters->symbolsArray.empty() ? ")\n" : "\n");
+	if (!parameters->symbolsArray.empty()) {
+		increaseIndent(indent);
 
-	for (auto it : declarations->symbolsArray) {
-		if (it->type->category == Type::Category::FUNCTION) {
-			continue;
-		}
-		else {
+		for (auto it : parameters->symbolsArray) {
 			std::string symcat = Symbol::categoryName[it->category];
 			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + it->type->toString() + "\n";
 			std::string strValue;
@@ -67,12 +56,48 @@ std::string FunctionType::toString()
 			}
 			res += (strValue.empty() ? "" : strValue + "\n");
 		}
+
+		decreaseIndent(indent);
+		res += indent + ") resultType : " + returnType->toString() + "\n";
 	}
-	
-	if (body != nullptr) {
+	else {
+		increaseIndent(indent);
+		res += indent + "resultType : " + returnType->toString() + "\n";
+		decreaseIndent(indent);
+	}
+
+	if (!declarations->symbolsArray.empty()) {
+		res += "\n" + indent + name + " declarations:\n";
+		increaseIndent(indent);
+
+		for (auto it : declarations->symbolsArray) {
+			if (it->token->text == "result") {
+				continue;
+			}
+
+			if (it->type->category == Type::FUNCTION) {
+				res += it->type->toString();
+				continue;
+			}
+
+			std::string symcat = Symbol::categoryName[it->category];
+			res += indent + it->token->text + " : " + symcat + (!symcat.empty() ? " " : "") + it->type->toString() + "\n";
+			std::string strValue;
+			if (it->value != nullptr) {
+				strValue = it->value->toString(std::string((indent + it->token->text).length() - 1, ' '));
+			}
+			//res += (strValue.empty() ? "" : strValue + (strValue.back() == '\n' ? "" : "\n"));
+			res += strValue + "\n";
+		}
+		decreaseIndent(indent);
+	}
+
+	if (!body->toString().empty()) {
+		res += "\n" + indent + name + " statements:\n";
+		increaseIndent(indent);
 		res += body->toString(indent);
+		decreaseIndent(indent);
 	}
-	decreaseIndent(indent);
 	return res;
 }
 

@@ -311,12 +311,14 @@ PIdentifierValue Parser::evalOperation(PSyntaxNode left, PSyntaxNode right, PTok
 
 PType Parser::parse()
 {
-	tables.push_back(std::make_shared<SymbolTable>());
 	parseProgram();
-	declarationPart();
-	std::shared_ptr<FunctionType> res(new FunctionType(tables.back(), Type::getSimpleType(Type::Category::NIL), compoundStatement(), programName));
-	requireCurrent({ SEP_DOT });
-	return res;
+	return functionDeclarationPart(MAIN_PROGRAM);
+	//declarationPart();
+	//std::shared_ptr<FunctionType> res(new FunctionType(std::make_shared<SymbolTable>(), tables.back(),
+	//	Type::getSimpleType(Type::Category::NIL), compoundStatement(), programName));
+	//
+	//requireThenNext({ SEP_DOT });
+	//return res;
 }
 
 void Parser::parseProgram()
@@ -346,11 +348,11 @@ void Parser::declarationPart()
 		}
 		else if (currentTokenType() == KEYWORD_FUNCTION) {
 			goToNextToken();
-			functionDeclarationPart(true);
+			functionDeclarationPart(FUNCTION);
 		}
 		else if (currentTokenType() == KEYWORD_PROCEDURE) {
 			goToNextToken();
-			functionDeclarationPart(false);
+			functionDeclarationPart(PROCEDURE);
 		}
 		else {
 			return;
@@ -596,9 +598,118 @@ PSyntaxNode Parser::typedConstant(PType type)
 	}
 }
 
-void Parser::functionDeclarationPart(bool isFunction)
+void Parser::parseFunctionParameters(PSymbolTable parameters)
 {
+	if (currentTokenType() != SEP_BRACKET_LEFT) {
+		return;
+	}
+	goToNextToken();
+	bool defaultParameters = false;
 
+	while (currentTokenType() != SEP_BRACKET_RIGHT) {
+		requireCurrent({ IDENTIFIER, KEYWORD_VAR, KEYWORD_CONST });
+		if (currentTokenType() == IDENTIFIER) {
+			auto identifiers = identifierList();
+			PType type = parseType();
+			PSyntaxNode value = parseConstValue(identifiers, type);
+
+			if (value != nullptr) {
+				defaultParameters = true;
+			}
+			else if (defaultParameters) {
+				throw LexicalException(currentToken()->row, currentToken()->col, "Default parameter required");
+			}
+
+			parameters->addVariables(identifiers, type, value);
+			requireCurrent({ SEP_BRACKET_RIGHT, SEP_SEMICOLON });
+		}
+		else if (currentTokenType() == KEYWORD_VAR) {
+			goToNextToken();
+			requireCurrent({ IDENTIFIER });
+
+			if (defaultParameters) {
+				throw LexicalException(currentToken()->row, currentToken()->col, "Default parameter required");
+			}
+
+			auto identifiers = identifierList();
+			PType type = parseType();
+			if (currentTokenType() == OP_EQUAL) {
+				throw LexicalException(currentToken()->row, currentToken()->col,
+					"Default values can only be specified for value and const parameters");
+			}
+			parameters->addVariables(identifiers, type, nullptr, Symbol::Category::VAR_PARAMETER);
+			requireCurrent({ SEP_BRACKET_RIGHT, SEP_SEMICOLON });
+		}
+		else if (currentTokenType() == KEYWORD_CONST) {
+			goToNextToken();
+			requireCurrent({ IDENTIFIER });
+			auto identifiers = identifierList();
+			PType type = parseType();
+			PSyntaxNode value = nullptr;
+
+			requireCurrent({ SEP_BRACKET_RIGHT, SEP_SEMICOLON, OP_EQUAL });
+			if (currentTokenType() == OP_EQUAL) {
+				goToNextToken();
+				value = typedConstant(type);
+			}
+
+			if (value != nullptr) {
+				defaultParameters = true;
+			}
+			else if (defaultParameters) {
+				throw LexicalException(currentToken()->row, currentToken()->col, "Default parameter required");
+			}
+			parameters->addConstants(identifiers, type, value);
+			requireCurrent({ SEP_BRACKET_RIGHT, SEP_SEMICOLON });
+		}
+		if (currentTokenType() != SEP_BRACKET_RIGHT) {
+			goToNextToken();
+		}
+	}
+	goToNextToken();
+}
+
+std::shared_ptr<FunctionType> Parser::functionDeclarationPart(functionDeclarationCategory declarationCategory)
+{
+	PToken functionToken = currentToken();
+	PSymbolTable parameters = std::make_shared<SymbolTable>();
+	PType returnType = Type::getSimpleType(Type::Category::NIL);
+
+	if (declarationCategory != MAIN_PROGRAM) {
+		requireCurrent({ IDENTIFIER });
+		goToNextToken();
+		parseFunctionParameters(parameters);
+
+		if (declarationCategory == FUNCTION) {
+			requireThenNext({ OP_COLON });
+			returnType = parseType();
+		}
+		requireThenNext({ SEP_SEMICOLON });
+	}
+
+	auto functionType = std::make_shared<FunctionType>(parameters, nullptr, returnType, nullptr,
+		(declarationCategory == MAIN_PROGRAM) ? programName : functionToken->text);
+
+	if (declarationCategory != MAIN_PROGRAM) {
+		tables.back()->addVariable(functionToken, functionType);
+	}
+	tables.push_back(parameters);
+
+	functionType->declarations = std::make_shared<SymbolTable>();
+	tables.push_back(functionType->declarations);
+	declarationPart();
+
+	PToken result = std::make_shared<Token>(IDENTIFIER, functionToken->row, functionToken->col, "result");
+	functionType->declarations->addVariable(result, returnType);
+	
+	functionType->body = compoundStatement();
+
+	if (declarationCategory == MAIN_PROGRAM) requireThenNext({ SEP_DOT });
+	else requireThenNext({ SEP_SEMICOLON });
+
+	tables.pop_back();
+	tables.pop_back();
+	return functionType;
 }
 
 PSyntaxNode Parser::compoundStatement()

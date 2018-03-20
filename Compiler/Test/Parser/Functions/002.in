@@ -1,0 +1,21 @@
+program test;
+
+function abc(a: integer): integer;
+type
+  myArr = array[-1..1] of double;
+const
+  c: myArr = (12, 22, 32);
+var
+  v: integer = 5 + 10;
+begin
+end;
+
+procedure proc(var name, surname: string; a: integer = 123; const b: double = 2.0);
+var
+  prInt: char = 'Y';
+  s: string = 'abaca';
+begin
+end;
+
+begin
+end.

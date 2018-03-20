@@ -1,0 +1,35 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   abc : function()
+      resultType : Integer
+
+   abc declarations:
+      myArr : Type Array [-1, 1] of Double
+
+      abcInner : function(
+         a : Integer
+         b : Integer
+         c : Integer
+      ) resultType : Double
+
+      abcInner declarations:
+         innerArray : Array [-1, 1] of Double
+
+      v : Integer
+      |-- 15
+
+   proc : function(
+      name : Var String
+      c : Const Char
+      d : Double
+   ) resultType : Nil
+
+   proc declarations:
+      prInt : Char
+          |-- Y
+
+      s : String
+      |-- abaca
+

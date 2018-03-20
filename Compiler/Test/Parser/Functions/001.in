@@ -1,0 +1,8 @@
+program test;
+
+function abc : integer;
+begin
+end;
+
+begin
+end.

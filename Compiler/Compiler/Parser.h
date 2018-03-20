@@ -54,7 +54,14 @@ private:
 	void requireTypesCompatibility(PType left, PType right);
 	PSyntaxNode typedConstant(PType type);
 
-	void functionDeclarationPart(bool isFunction);
+	enum functionDeclarationCategory {
+		FUNCTION,
+		PROCEDURE,
+		MAIN_PROGRAM,
+	};
+
+	void parseFunctionParameters(PSymbolTable parameters);
+	std::shared_ptr<FunctionType> functionDeclarationPart(functionDeclarationCategory declarationCategory);
 
 	PSyntaxNode compoundStatement();
 	PSyntaxNode statementList();

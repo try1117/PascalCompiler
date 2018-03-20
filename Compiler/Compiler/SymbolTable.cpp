@@ -25,17 +25,17 @@ void SymbolTable::addType(PToken token, PType type)
 	addSymbol(sym);
 }
 
-void SymbolTable::addVariable(PToken token, PType type, PSyntaxNode value)
+void SymbolTable::addVariable(PToken token, PType type, PSyntaxNode value, Symbol::Category category)
 {
 	checkDuplication(token);
-	PSymbol sym = std::make_shared<Symbol>(token, type, Symbol::Category::NIL, value);
+	PSymbol sym = std::make_shared<Symbol>(token, type, category, value);
 	addSymbol(sym);
 }
 
-void SymbolTable::addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value)
+void SymbolTable::addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value, Symbol::Category category)
 {
 	for (auto it : tokens) {
-		addVariable(it, type, value);
+		addVariable(it, type, value, category);
 	}
 }
 
@@ -44,6 +44,13 @@ void SymbolTable::addConstant(PToken token, PType type, PSyntaxNode value)
 	checkDuplication(token);
 	PSymbol sym = std::make_shared<Symbol>(token, type, Symbol::Category::CONST, value);
 	addSymbol(sym);
+}
+
+void SymbolTable::addConstants(std::vector<PToken> tokens, PType type, PSyntaxNode value)
+{
+	for (auto it : tokens) {
+		addConstant(it, type, value);
+	}
 }
 
 PSymbol SymbolTable::getSymbol(PToken token)

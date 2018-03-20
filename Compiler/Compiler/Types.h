@@ -62,11 +62,14 @@ public:
 
 class FunctionType : public Type {
 public:
-	PSymbolTable declarations;
+	PSymbolTable parameters, declarations;
 	PType returnType;
 	PSyntaxNode body;
 	std::string name;
 
-	FunctionType(PSymbolTable declarations, PType returnType, PSyntaxNode body, std::string name);
+	FunctionType(PSymbolTable parameters, PSymbolTable declarations, PType returnType, PSyntaxNode body, std::string name)
+		: Type(Category::FUNCTION), parameters(parameters), declarations(declarations), returnType(returnType), body(body), name(name)
+	{}
+
 	std::string toString();
 };

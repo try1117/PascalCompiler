@@ -42,10 +42,11 @@ public:
 	void checkDuplication(PToken token);
 	void addType(PToken token, PType type);
 	
-	void addVariable(PToken token, PType type, PSyntaxNode value = nullptr);
-	void addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value = nullptr);
+	void addVariable(PToken token, PType type, PSyntaxNode value = nullptr, Symbol::Category category = Symbol::Category::NIL);
+	void addVariables(std::vector<PToken> tokens, PType type, PSyntaxNode value = nullptr, Symbol::Category category = Symbol::Category::NIL);
 
 	void addConstant(PToken token, PType type, PSyntaxNode value);
+	void addConstants(std::vector<PToken> tokens, PType type, PSyntaxNode value);
 
 	PSymbol getSymbol(PToken token);
 
