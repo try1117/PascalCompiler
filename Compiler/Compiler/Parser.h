@@ -66,4 +66,10 @@ private:
 	PSyntaxNode compoundStatement();
 	PSyntaxNode statementList();
 	PSyntaxNode parseStatement();
+
+	PSyntaxNode assignStatement();
+	PSyntaxNode indexedVariable(PSyntaxNode node);
+	PSyntaxNode fieldAccess(PSyntaxNode node);
+
+	PSymbol findSymbolInTables(PToken token);
 };

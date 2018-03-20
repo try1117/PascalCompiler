@@ -2,8 +2,8 @@
 #include "SyntaxObject.h"
 #include "Utils.h"
 
-SyntaxNode::SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children)
-	: token(token), type(type), children(children)
+SyntaxNode::SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children, Category category)
+	: token(token), type(type), children(children), category(category)
 {
 }
 
@@ -20,7 +20,7 @@ void SyntaxNode::print(std::string &output, std::string prefix, bool end)
 
 	prefix += (end ? "    " : "|   ");
 	if (token) {
-		increaseIndent(prefix, token->text.length());
+		increaseIndent(prefix, (int)token->text.length() - 1);
 	}
 	children[0]->print(output, prefix, false);
 

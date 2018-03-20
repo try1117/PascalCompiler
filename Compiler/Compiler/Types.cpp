@@ -93,10 +93,10 @@ std::string FunctionType::toString()
 	}
 
 	if (!body->toString().empty()) {
-		res += "\n" + indent + name + " statements:\n";
-		increaseIndent(indent);
+		//res += "\n" + indent + name + " statements:\n";
+		//increaseIndent(indent);
 		res += body->toString(indent);
-		decreaseIndent(indent);
+		//decreaseIndent(indent);
 	}
 	return res;
 }

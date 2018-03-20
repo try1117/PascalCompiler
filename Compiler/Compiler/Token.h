@@ -5,6 +5,7 @@
 
 enum TokenType;
 extern std::string TokenName[];
+extern std::string TokenFriendlyName[];
 
 class Token;
 typedef std::shared_ptr<Token> PToken;

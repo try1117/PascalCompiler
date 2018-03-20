@@ -32,11 +32,11 @@ void Parser::requireCurrent(std::initializer_list<TokenType> types)
 		if (!res.empty()) {
 			res += " or ";
 		}
-		res += TokenName[type];
+		res += "\"" + TokenFriendlyName[type] + "\"";
 	}
 
 	throw SyntaxException(currentToken()->row, currentToken()->col,
-		"Expected " + res + " but found " + currentToken()->text);
+		"Expected " + res + " but found \"" + currentToken()->text + "\"");
 }
 
 void Parser::requireThenNext(std::initializer_list<TokenType> types)
@@ -226,7 +226,11 @@ PType Parser::getOperationType(PType left, PType right, PToken operation)
 
 PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
 {
-	if (node->type->category != to->category) {
+	PType type = node->type;
+	if (type->category == Type::FUNCTION) {
+		type = std::static_pointer_cast<FunctionType>(node->type)->returnType;
+	}
+	if (type->category != to->category) {
 		return std::make_shared<CastNode>(node, to);
 	}
 	return node;
@@ -491,7 +495,12 @@ std::vector<PToken> Parser::identifierList()
 
 bool Parser::instanceOfConstNode(PSyntaxNode node)
 {
-	return std::static_pointer_cast<ConstNode>(node) != nullptr;
+	//auto tmp = std::static_pointer_cast<ConstNode>(node);
+	//auto varnode = std::static_pointer_cast<VarNode>(node);
+	//bool res = tmp != nullptr;
+	//return std::static_pointer_cast<ConstNode>(node) != nullptr;
+	if (node == nullptr) return false;
+	return node->category == SyntaxNode::Category::CONST_NODE;
 }
 
 void Parser::constDeclarationPart()
@@ -525,6 +534,11 @@ void Parser::constDeclarationPart()
 
 void Parser::requireTypesCompatibility(PType left, PType right)
 {
+	if (left->category == Type::FUNCTION)
+		left = std::static_pointer_cast<FunctionType>(left)->returnType;
+	if (right->category == Type::FUNCTION)
+		right = std::static_pointer_cast<FunctionType>(right)->returnType;
+
 	std::vector<std::pair<Type::Category, Type::Category>> pairs = {
 		{ Type::DOUBLE, Type::INTEGER },
 		{ Type::INTEGER, Type::CHAR },
@@ -722,7 +736,7 @@ PSyntaxNode Parser::compoundStatement()
 
 PSyntaxNode Parser::statementList()
 {
-	PSyntaxNode statement = std::make_shared<SyntaxNode>();// BodyFunction();
+	PSyntaxNode statement = std::make_shared<SyntaxNode>(std::make_shared<Token>(UNDEFINED, 0, 0, "Statements"), Type::getSimpleType(Type::NIL));
 	do {
 		goToNextToken();
 		PSyntaxNode node = parseStatement();
@@ -735,14 +749,114 @@ PSyntaxNode Parser::statementList()
 PSyntaxNode Parser::parseStatement()
 {
 	switch (currentTokenType()) {
-		case IDENTIFIER:
-			return nullptr;
+		case IDENTIFIER: {
+			PToken token = currentToken();
+			PSymbol symbol = findSymbolInTables(token);
+			if (symbol->category == Symbol::CONST) {
+				throw LexicalException(token->row, token->col, "Can't assign values to const variable");
+			}
+			if (symbol->type->category == Type::FUNCTION) {
+				goToNextToken();
+				//return parseFunctionCall();
+			}
+			return assignStatement();
+		}
 		case KEYWORD_BEGIN:
 			return compoundStatement();
 		case SEP_SEMICOLON:
 		case KEYWORD_END:
 			return nullptr;
 		default:
-			throw LexicalException(currentToken()->row, currentToken()->col, "Unexpected token " + currentToken()->text);
+			throw LexicalException(currentToken()->row, currentToken()->col, "Unexpected token \"" + currentToken()->text + "\"");
 	}
+}
+
+PSyntaxNode Parser::assignStatement()
+{
+	PToken token = currentToken();
+	PSymbol symbol = findSymbolInTables(token);
+	PSyntaxNode node = std::make_shared<VarNode>(token, symbol->type);
+	
+	if (symbol->type->category == Type::NIL || symbol->type->category == Type::FUNCTION) {
+		throw LexicalException(token->row, token->col, "Variable identifier expected");
+	}
+	
+	goToNextToken();
+	if (symbol->type->category == Type::ARRAY) {
+		node = indexedVariable(node);
+	}
+	else if (symbol->type->category == Type::RECORD) {
+		node = fieldAccess(node);
+	}
+
+	requireThenNext({ KEYWORD_ASSIGN });
+	PSyntaxNode expr = parseLogical();
+
+	requireTypesCompatibility(symbol->type, expr->type);
+	PSyntaxNode castExpr = cast(expr, symbol->type);
+
+	return std::make_shared<AssignStatement>(node->type, std::initializer_list<PSyntaxNode>({ node, expr }));
+}
+
+PSyntaxNode Parser::indexedVariable(PSyntaxNode node)
+{
+	while (currentTokenType() == SEP_BRACKET_SQUARE_LEFT) {
+		if (node->type->category != Type::ARRAY) {
+			throw LexicalException(currentToken()->row, currentToken()->col, "Expected array but found " + node->type->toString());
+		}
+
+		auto arr = std::static_pointer_cast<ArrayType>(node->type);
+		goToNextToken();
+		PSyntaxNode expr = parseLogical();
+		requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), expr->type);
+
+		expr = cast(expr, Type::getSimpleType(Type::INTEGER));
+		node = std::make_shared<IndexNode>(arr->elementType, std::initializer_list<PSyntaxNode>({node, expr}));
+		requireThenNext({ SEP_BRACKET_SQUARE_RIGHT });
+	}
+
+	if (node->type->category == Type::RECORD) {
+		return fieldAccess(node);
+	}
+
+	return node;
+}
+
+PSyntaxNode Parser::fieldAccess(PSyntaxNode node)
+{
+	while (currentTokenType() == SEP_DOT) {
+		if (node->type->category != Type::RECORD) {
+			throw LexicalException(currentToken()->row, currentToken()->col, "Expected record but found " + node->type->toString());
+		}
+
+		goToNextToken();
+		requireCurrent({ IDENTIFIER });
+		auto rec = std::static_pointer_cast<RecordType>(node->type);
+		PToken field = currentToken();
+
+		PSymbol symbol = rec->fields->getSymbol(field);
+		if (symbol == nullptr) {
+			throw LexicalException(field->row, field->col, "Field not found \"" + field->text + "\"");
+		}
+
+		PSyntaxNode varNode = std::make_shared<VarNode>(field, symbol->type);
+		node = std::make_shared<FieldAccessNode>(symbol->type, std::initializer_list<PSyntaxNode>({ node, varNode }));
+		goToNextToken();
+	}
+
+	if (node->type->category == Type::ARRAY) {
+		return indexedVariable(node);
+	}
+	return node;
+}
+
+PSymbol Parser::findSymbolInTables(PToken token)
+{
+	for (int i = (int)tables.size() - 1; i >= 0; --i) {
+		PSymbol sym = tables[i]->getSymbol(token);
+		if (sym != nullptr) {
+			return sym;
+		}
+	}
+	throw LexicalException(token->row, token->col, "Identifier not found \"" + token->text + "\"");
 }

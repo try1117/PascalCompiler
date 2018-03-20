@@ -421,7 +421,7 @@ void Tokenizer::parseOperator(char c)
 	char nxt = reader.nextSymbol();
 	if (c == ':') {
 		if (nxt == '=') {
-			token->type = OP_EQUAL;
+			token->type = KEYWORD_ASSIGN;
 			token->text.push_back(nxt);
 		}
 		else {

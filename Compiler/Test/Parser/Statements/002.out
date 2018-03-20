@@ -1,0 +1,32 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   b : Integer
+
+   c : Integer
+
+|-- Statements
+|            |-- :=
+|            |    |-- a
+|            |    --- +
+|            |        |-- 5
+|            |        --- b
+|            |-- :=
+|            |    |-- b
+|            |    --- c
+|            --- :=
+|                 |-- c
+|                 --- div
+|                       |-- +
+|                       |   |-- +
+|                       |   |   |-- a
+|                       |   |   --- b
+|                       |   --- c
+|                       --- +
+|                           |-- 20
+|                           --- *
+|                               |-- b
+|                               --- b

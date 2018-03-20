@@ -1,0 +1,7 @@
+program test;
+var a, b, c: integer;
+begin
+  a := 5 + b;
+  b := c;
+  c := (a + b + c) div (10 * 2 + 0 + b * b);  
+end.
