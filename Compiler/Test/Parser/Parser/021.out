@@ -1,9 +1,10 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Record
       a : Integer
       b : Double
       c : Array [-5, 5] of Char
    end
+

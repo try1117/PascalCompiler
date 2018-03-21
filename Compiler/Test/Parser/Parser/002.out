@@ -1,5 +1,6 @@
 abc : function()
    resultType : Nil
-   
-Declarations:
+
+abc declarations:
    a : Integer
+

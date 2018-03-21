@@ -1,0 +1,17 @@
+program test;
+var
+  a, b, c: integer;
+  doub: double;
+  arr: array[-5..5] of array[1..10] of double;
+  rec: record
+    i: integer;
+    d: double;
+    arr: array[0..7] of string;
+  end;
+begin
+  doub := 555 + 5;
+  arr[0][1] := 1.5 + a;
+  rec.i := 10;
+  rec.d := 10;
+  rec.arr[5] := 'abcde';
+end.

@@ -1,14 +1,14 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Record
       name : String
       age : Integer
       height : Double
    end
    |-- Record
-   |         |-- Alice
-   |         |-- 17
-   |         --- 5.600000
+   |        |-- Alice
+   |        |-- 17
+   |        --- 5.600000
 

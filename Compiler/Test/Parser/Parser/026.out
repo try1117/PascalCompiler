@@ -1,9 +1,11 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    intvar : Integer
+
    cc : Integer
+
    abaca : Record
       caption : String
       width : Integer
@@ -15,18 +17,18 @@ Declarations:
       additional : Char
    end
        |-- Record
-       |         |-- Tesla
-       |         |-- 539
-       |         |-- 846
-       |         |-- Array
-       |         |        |-- Record
-       |         |        |         |-- Mark
-       |         |        |         --- 876425
-       |         |        |-- Record
-       |         |        |         |-- Andrew
-       |         |        |         --- 2232237
-       |         |        --- Record
-       |         |                  |-- Michael
-       |         |                  --- 776776
-       |         --- 3
+       |        |-- Tesla
+       |        |-- 539
+       |        |-- 846
+       |        |-- Array
+       |        |       |-- Record
+       |        |       |        |-- Mark
+       |        |       |        --- 876425
+       |        |       |-- Record
+       |        |       |        |-- Andrew
+       |        |       |        --- 2232237
+       |        |       --- Record
+       |        |                |-- Michael
+       |        |                --- 776776
+       |        --- 3
 

@@ -1,7 +1,7 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Const Double
    |-- 1.000000
 

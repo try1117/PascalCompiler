@@ -1,12 +1,12 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Array [3, 7] of Integer
    |-- Array
-   |        |-- 10
-   |        |-- 11
-   |        |-- 22
-   |        |-- 33
-   |        --- 44
+   |       |-- 10
+   |       |-- 11
+   |       |-- 22
+   |       |-- 33
+   |       --- 44
 

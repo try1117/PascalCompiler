@@ -1,7 +1,7 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Integer
    |-- 1
 

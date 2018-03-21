@@ -226,6 +226,9 @@ PType Parser::getOperationType(PType left, PType right, PToken operation)
 
 PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
 {
+	if (instanceOfConstNode(node)) {
+		return castConstNode(node, to);
+	}
 	PType type = node->type;
 	if (type->category == Type::FUNCTION) {
 		type = std::static_pointer_cast<FunctionType>(node->type)->returnType;
@@ -288,8 +291,8 @@ PSyntaxNode Parser::createOperationNode(PSyntaxNode left, PSyntaxNode right, PTo
 	}
 
 	// otherwise cast operands to operationType
-	left = (leftIsConst ? castConstNode(left, operationType) : cast(left, operationType));
-	right = (rightIsConst ? castConstNode(right, operationType) : cast(right, operationType));
+	left = cast(left, operationType);
+	right = cast(right, operationType);
 	if (leftIsConst && rightIsConst) {
 		return std::make_shared<ConstNode>(operation, operationType, evalOperation(left, right, operation, operationType));
 	}
@@ -792,8 +795,8 @@ PSyntaxNode Parser::assignStatement()
 	requireThenNext({ KEYWORD_ASSIGN });
 	PSyntaxNode expr = parseLogical();
 
-	requireTypesCompatibility(symbol->type, expr->type);
-	PSyntaxNode castExpr = cast(expr, symbol->type);
+	requireTypesCompatibility(node->type, expr->type);
+	PSyntaxNode castExpr = cast(expr, node->type);
 
 	return std::make_shared<AssignStatement>(node->type, std::initializer_list<PSyntaxNode>({ node, expr }));
 }
@@ -811,6 +814,15 @@ PSyntaxNode Parser::indexedVariable(PSyntaxNode node)
 		requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), expr->type);
 
 		expr = cast(expr, Type::getSimpleType(Type::INTEGER));
+		if (instanceOfConstNode(expr)) {
+			auto constNode = std::static_pointer_cast<ConstNode>(expr);
+			if (constNode->value->getInteger() < arr->left->value->getInteger() ||
+				constNode->value->getInteger() > arr->right->value->getInteger())
+			{
+				throw LexicalException(currentToken()->row, currentToken()->col, "Index out of range");
+			}
+		}
+
 		node = std::make_shared<IndexNode>(arr->elementType, std::initializer_list<PSyntaxNode>({node, expr}));
 		requireThenNext({ SEP_BRACKET_SQUARE_RIGHT });
 	}

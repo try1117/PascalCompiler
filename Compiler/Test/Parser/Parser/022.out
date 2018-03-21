@@ -1,8 +1,9 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    myarr : Type Array [11, 12] of String
+
    a : Record
       a : Integer
       b : Double
@@ -12,3 +13,4 @@ Declarations:
       end
       d : String
    end
+

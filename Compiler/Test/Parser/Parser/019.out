@@ -1,5 +1,6 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    a : Array [1, 10] of Integer
+

@@ -1,0 +1,51 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   b : Integer
+
+   c : Integer
+
+   doub : Double
+
+   arr : Array [-5, 5] of Array [1, 10] of Double
+
+   rec : Record
+      i : Integer
+      d : Double
+      arr : Array [0, 7] of String
+   end
+
+|-- Statements
+|            |-- :=
+|            |    |-- doub
+|            |    --- 560.000000
+|            |-- :=
+|            |    |-- []
+|            |    |    |-- []
+|            |    |    |    |-- arr
+|            |    |    |    --- 0
+|            |    |    --- 1
+|            |    --- +
+|            |        |-- 1.500000
+|            |        --- a
+|            |            |-- a
+|            |-- :=
+|            |    |-- .
+|            |    |   |-- rec
+|            |    |   --- i
+|            |    --- 10
+|            |-- :=
+|            |    |-- .
+|            |    |   |-- rec
+|            |    |   --- d
+|            |    --- 10.000000
+|            --- :=
+|                 |-- []
+|                 |    |-- .
+|                 |    |   |-- rec
+|                 |    |   --- arr
+|                 |    --- 5
+|                 --- abcde

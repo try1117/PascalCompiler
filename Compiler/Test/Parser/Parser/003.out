@@ -1,12 +1,20 @@
 abc : function()
    resultType : Nil
-   
-Declarations:
+
+abc declarations:
    a : Integer
+
    b : Integer
+
    c : Integer
+
    d : Integer
+
    c3 : Char
+
    e : Double
+
    c1 : Char
+
    c2 : Char
+

@@ -1,6 +1,8 @@
 abc : function()
    resultType : Nil
-   
-Declarations:
+
+abc declarations:
    myInteger : Type Integer
+
    myDouble : Type Double
+

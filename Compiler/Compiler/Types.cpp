@@ -92,7 +92,7 @@ std::string FunctionType::toString()
 		decreaseIndent(indent);
 	}
 
-	if (!body->toString().empty()) {
+	if (!body->children.empty()) {
 		//res += "\n" + indent + name + " statements:\n";
 		//increaseIndent(indent);
 		res += body->toString(indent);

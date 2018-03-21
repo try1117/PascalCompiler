@@ -1,8 +1,12 @@
 test : function()
    resultType : Nil
-   
-Declarations:
+
+test declarations:
    int : Type Integer
+
    a : Integer
+
    db : Type Double
+
    b : Double
+
