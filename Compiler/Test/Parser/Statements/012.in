@@ -1,0 +1,18 @@
+program test;
+var
+  name: string;
+  age: integer;
+begin
+  if 12 + 6 = 17 then
+    if 5 * 5 = 25 then
+    begin
+      name := 'Roman';
+      age := 58474;
+    end
+    else begin
+      name := 'qwer';
+      age := 123123;
+    end
+  else
+    name := 'ERROR';
+end.

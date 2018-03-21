@@ -320,12 +320,6 @@ PType Parser::parse()
 {
 	parseProgram();
 	return functionDeclarationPart(MAIN_PROGRAM);
-	//declarationPart();
-	//std::shared_ptr<FunctionType> res(new FunctionType(std::make_shared<SymbolTable>(), tables.back(),
-	//	Type::getSimpleType(Type::Category::NIL), compoundStatement(), programName));
-	//
-	//requireThenNext({ SEP_DOT });
-	//return res;
 }
 
 void Parser::parseProgram()
@@ -775,6 +769,8 @@ PSyntaxNode Parser::parseStatement()
 			}
 			return assignStatement();
 		}
+		case KEYWORD_IF:
+			return ifStatement();
 		case KEYWORD_BEGIN:
 			return compoundStatement();
 		case SEP_SEMICOLON:
@@ -871,6 +867,23 @@ PSyntaxNode Parser::fieldAccess(PSyntaxNode node)
 		return indexedVariable(node);
 	}
 	return node;
+}
+
+PSyntaxNode Parser::ifStatement()
+{
+	requireThenNext({ KEYWORD_IF });
+	PSyntaxNode expr = parseLogical();
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), expr->type);
+	expr = cast(expr, Type::getSimpleType(Type::INTEGER));
+
+	requireThenNext({ KEYWORD_THEN });
+	PSyntaxNode ifPart = parseStatement();
+	PSyntaxNode elsePart = nullptr;
+	if (currentTokenType() == KEYWORD_ELSE) {
+		goToNextToken();
+		elsePart = parseStatement();
+	}
+	return std::make_shared<IfStatement>(expr, ifPart, elsePart, Type::getSimpleType(Type::NIL));
 }
 
 PSymbol Parser::findSymbolInTables(PToken token)

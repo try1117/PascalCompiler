@@ -71,5 +71,7 @@ private:
 	PSyntaxNode indexedVariable(PSyntaxNode node);
 	PSyntaxNode fieldAccess(PSyntaxNode node);
 
+	PSyntaxNode ifStatement();
+
 	PSymbol findSymbolInTables(PToken token);
 };

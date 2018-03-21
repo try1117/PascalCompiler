@@ -96,3 +96,18 @@ public:
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_ASSIGN, 0, 0, ":="), type, children)
 	{}
 };
+
+class IfStatement : public SyntaxNode {
+public:
+	PSyntaxNode condition, ifPart, elsePart;
+	IfStatement(PSyntaxNode condition, PSyntaxNode ifPart, PSyntaxNode elsePart, PType type)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_IF, 0, 0, "If"), type),
+		condition(condition), ifPart(ifPart), elsePart(elsePart)
+	{
+		children.push_back(condition);
+		children.push_back(ifPart);
+		if (elsePart != nullptr) {
+			children.push_back(elsePart);
+		}
+	}
+};

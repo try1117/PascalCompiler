@@ -1,0 +1,6 @@
+program test;
+var a: integer;
+begin
+  if 'q' then a := 1;
+  if 'qw' then a := 1;
+end.

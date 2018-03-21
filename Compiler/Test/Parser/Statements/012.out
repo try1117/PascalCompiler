@@ -1,0 +1,30 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   name : String
+
+   age : Integer
+
+|-- Statements
+|            |-- If
+|            |    |-- 0
+|            |    |-- If
+|            |    |    |-- 1
+|            |    |    |-- Statements
+|            |    |    |            |-- :=
+|            |    |    |            |    |-- name
+|            |    |    |            |    --- 'Roman'
+|            |    |    |            --- :=
+|            |    |    |                 |-- age
+|            |    |    |                 --- 58474
+|            |    |    --- Statements
+|            |    |                 |-- :=
+|            |    |                 |    |-- name
+|            |    |                 |    --- 'qwer'
+|            |    |                 --- :=
+|            |    |                      |-- age
+|            |    |                      --- 123123
+|            |    --- :=
+|            |         |-- name
+|            |         --- 'ERROR'
