@@ -1,0 +1,10 @@
+program test;
+var
+  rec: record
+    i: integer;
+    d: double;
+  end;
+begin
+  rec.i := 25;
+  rec.qwerty := 'qwerty';
+end.

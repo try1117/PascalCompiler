@@ -1,0 +1,23 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Array [-100, 100] of Array [97, 122] of Integer
+
+   b : Array [-100, 100] of Array [97, 122] of Char
+
+|-- Statements
+|            |-- :=
+|            |    |-- []
+|            |    |    |-- []
+|            |    |    |    |-- a
+|            |    |    |    --- -28
+|            |    |    --- 116
+|            |    --- 89
+|            --- :=
+|                 |-- []
+|                 |    |-- []
+|                 |    |    |-- b
+|                 |    |    --- 100
+|                 |    --- 122
+|                 --- 'Y'

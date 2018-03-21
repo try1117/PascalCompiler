@@ -1,0 +1,8 @@
+program test;
+var
+  a: array[-100..100] of array['a'..'z'] of integer;
+  b: array[-100..100] of array['a'..'z'] of char;
+begin
+  a[-28]['t'] := 'Y';
+  b[100]['z'] := 'Y';
+end.

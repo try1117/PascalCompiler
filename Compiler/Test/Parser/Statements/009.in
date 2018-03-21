@@ -1,0 +1,6 @@
+program test;
+var
+  a: array[-100..100] of array['z'..'a'] of integer;
+begin
+  a[-28]['e'] := 'Y';
+end.

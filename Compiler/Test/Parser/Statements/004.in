@@ -1,0 +1,7 @@
+program test;
+var
+  a: array[1..10] of integer;
+  idx: integer = 0;
+begin
+  a[idx] := 25;
+end.

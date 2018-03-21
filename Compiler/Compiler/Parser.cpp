@@ -419,16 +419,27 @@ PType Parser::parseArrayType()
 	requireThenNext({ SEP_BRACKET_SQUARE_LEFT });
 
 	PSyntaxNode left = parseExpr();
-	if (left->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
-		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[left->type->category]);
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), left->type);
+	left = cast(left, Type::getSimpleType(Type::INTEGER));
+	if (!instanceOfConstNode(left)) {
+		throw LexicalException(left->token->row, left->token->col, "Expected Const Integer but found " + left->type->toString());
 	}
 	requireThenNext({ SEP_DOUBLE_DOT });
 
 	PSyntaxNode right = parseExpr();
-	if (right->type->category != Type::Category::INTEGER || !instanceOfConstNode(left)) {
-		throw LexicalException(left->token->row, left->token->col, "Expected const integer but found " + Type::categoryName[right->type->category]);
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), right->type);
+	right = cast(right, Type::getSimpleType(Type::INTEGER));
+	if (!instanceOfConstNode(right)) {
+		throw LexicalException(right->token->row, right->token->col, "Expected Const Integer but found " + right->type->toString());
 	}
 	requireThenNext({ SEP_BRACKET_SQUARE_RIGHT });
+
+	auto leftConst = std::static_pointer_cast<ConstNode>(left);
+	auto rightConst = std::static_pointer_cast<ConstNode>(right);
+	
+	if (leftConst->value->toInteger() > rightConst->value->toInteger()) {
+		throw LexicalException(left->token->row, left->token->col, "High range limit < low range limit");
+	}
 
 	requireThenNext({ KEYWORD_OF });
 	return std::make_shared<ArrayType>(parseType(), std::static_pointer_cast<ConstNode>(left), std::static_pointer_cast<ConstNode>(right));
