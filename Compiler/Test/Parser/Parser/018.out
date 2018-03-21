@@ -3,14 +3,14 @@ test : function()
 
 test declarations:
    a : String
-   |-- aba
+   |-- 'aba'
 
    b : Const String
-   |-- qweraba
+   |-- 'qweraba'
 
    c : Const Integer
    |-- 1
 
    d : Const String
-   |-- danilov
+   |-- 'danilov'
 

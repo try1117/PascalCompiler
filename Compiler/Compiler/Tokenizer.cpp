@@ -252,7 +252,7 @@ void Tokenizer::parseNumber(char c)
 				token->text += c;
 			}
 			// double dot ".." case
-			else if (c == '.') {
+			else if (c == '.' && token->text.back() == '.') {
 				token->text.pop_back();
 				reader.symbolRollback();
 				reader.symbolRollback();

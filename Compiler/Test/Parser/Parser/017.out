@@ -12,5 +12,5 @@ test declarations:
    |-- -5
 
    d : Const Char
-   |-- 7
+   |-- '7'
 

@@ -6,6 +6,6 @@
 2  | 3  | SEP_BRACKET_RIGHT        | )                        | 
 2  | 4  | SEP_BRACKET_SQUARE_LEFT  | [                        | 
 2  | 5  | SEP_BRACKET_LEFT         | (                        | 
-2  | 6  | VARIABLE                 | www                      | 
+2  | 6  | IDENTIFIER               | www                      | 
 2  | 9  | SEP_BRACKET_RIGHT        | )                        | 
 2  | 10 | SEP_BRACKET_SQUARE_RIGHT | ]                        | 

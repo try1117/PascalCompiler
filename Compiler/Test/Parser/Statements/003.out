@@ -48,4 +48,4 @@ test declarations:
 |                 |    |   |-- rec
 |                 |    |   --- arr
 |                 |    --- 5
-|                 --- abcde
+|                 --- 'abcde'

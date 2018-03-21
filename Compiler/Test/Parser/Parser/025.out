@@ -8,7 +8,7 @@ test declarations:
       height : Double
    end
    |-- Record
-   |        |-- Alice
+   |        |-- 'Alice'
    |        |-- 17
    |        --- 5.600000
 

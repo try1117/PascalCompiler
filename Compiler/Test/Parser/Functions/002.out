@@ -31,8 +31,8 @@ test declarations:
 
    proc declarations:
       prInt : Char
-          |-- Y
+          |-- 'Y'
 
       s : String
-      |-- abaca
+      |-- 'abaca'
 

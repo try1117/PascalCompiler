@@ -1,5 +1,5 @@
 1  | 1  | KEYWORD_VAR              | var                      | 
-1  | 5  | VARIABLE                 | a                        | 
+1  | 5  | IDENTIFIER               | a                        | 
 1  | 7  | OP_COLON                 | :                        | 
 1  | 9  | KEYWORD_INTEGER          | integer                  | 
 1  | 16 | SEP_SEMICOLON            | ;                        | 

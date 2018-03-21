@@ -17,18 +17,18 @@ test declarations:
       additional : Char
    end
        |-- Record
-       |        |-- Tesla
+       |        |-- 'Tesla'
        |        |-- 539
        |        |-- 846
        |        |-- Array
        |        |       |-- Record
-       |        |       |        |-- Mark
+       |        |       |        |-- 'Mark'
        |        |       |        --- 876425
        |        |       |-- Record
-       |        |       |        |-- Andrew
+       |        |       |        |-- 'Andrew'
        |        |       |        --- 2232237
        |        |       --- Record
-       |        |                |-- Michael
+       |        |                |-- 'Michael'
        |        |                --- 776776
-       |        --- 3
+       |        --- '3'
 

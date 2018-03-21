@@ -328,7 +328,7 @@ std::string IdentifierValue::toString()
 		return std::to_string(get._double);
 	}
 	else if (category == CHAR || category == STRING) {
-		return get.string;
+		return "'" + std::string(get.string) + "'";
 	}
 	else {
 		throw std::exception("Uninitialized IdentifierValue");

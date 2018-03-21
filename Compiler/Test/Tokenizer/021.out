@@ -1,5 +1,5 @@
 1  | 1  | CONST_STRING             | 123qwer'ty               | 
-1  | 14 | VARIABLE                 | another                  | 
+1  | 14 | IDENTIFIER               | another                  | 
 1  | 21 | CONST_STRING             |                          | 
 2  | 1  | KEYWORD_BEGIN            | begin                    | 
 2  | 7  | KEYWORD_END              | end                      | 
