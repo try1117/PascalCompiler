@@ -771,6 +771,8 @@ PSyntaxNode Parser::parseStatement()
 		}
 		case KEYWORD_IF:
 			return ifStatement();
+		case KEYWORD_WHILE:
+			return whileStatement();
 		case KEYWORD_BEGIN:
 			return compoundStatement();
 		case SEP_SEMICOLON:
@@ -871,10 +873,13 @@ PSyntaxNode Parser::fieldAccess(PSyntaxNode node)
 
 PSyntaxNode Parser::ifStatement()
 {
-	requireThenNext({ KEYWORD_IF });
-	PSyntaxNode expr = parseLogical();
-	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), expr->type);
-	expr = cast(expr, Type::getSimpleType(Type::INTEGER));
+	requireCurrent({ KEYWORD_IF });
+	PToken ifToken = currentToken();
+	goToNextToken();
+
+	PSyntaxNode condition = parseLogical();
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), condition->type);
+	condition = cast(condition, Type::getSimpleType(Type::INTEGER));
 
 	requireThenNext({ KEYWORD_THEN });
 	PSyntaxNode ifPart = parseStatement();
@@ -883,7 +888,19 @@ PSyntaxNode Parser::ifStatement()
 		goToNextToken();
 		elsePart = parseStatement();
 	}
-	return std::make_shared<IfStatement>(expr, ifPart, elsePart, Type::getSimpleType(Type::NIL));
+	return std::make_shared<IfStatement>(ifToken, Type::getSimpleType(Type::NIL), condition, ifPart, elsePart);
+}
+
+PSyntaxNode Parser::whileStatement()
+{
+	++loopCnt;
+	PToken whileToken = currentToken();
+	goToNextToken();
+	PSyntaxNode condition = parseLogical();
+	requireThenNext({ KEYWORD_DO });
+	PSyntaxNode body = parseStatement();
+	--loopCnt;
+	return std::make_shared<WhileNode>(whileToken, Type::getSimpleType(Type::NIL), condition, body);
 }
 
 PSymbol Parser::findSymbolInTables(PToken token)

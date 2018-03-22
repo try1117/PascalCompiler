@@ -100,14 +100,31 @@ public:
 class IfStatement : public SyntaxNode {
 public:
 	PSyntaxNode condition, ifPart, elsePart;
-	IfStatement(PSyntaxNode condition, PSyntaxNode ifPart, PSyntaxNode elsePart, PType type)
-		: SyntaxNode(std::make_shared<Token>(KEYWORD_IF, 0, 0, "If"), type),
+	IfStatement(PToken token, PType type, PSyntaxNode condition, PSyntaxNode ifPart, PSyntaxNode elsePart)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_IF, token->row, token->col, "If"), type),
 		condition(condition), ifPart(ifPart), elsePart(elsePart)
 	{
 		children.push_back(condition);
-		children.push_back(ifPart);
-		if (elsePart != nullptr) {
-			children.push_back(elsePart);
-		}
+		if (ifPart != nullptr) children.push_back(ifPart);
+		if (elsePart != nullptr) children.push_back(elsePart);
 	}
+};
+
+class WhileNode : public SyntaxNode {
+public:
+	PSyntaxNode condition, body;
+	WhileNode(PToken token, PType type, PSyntaxNode condition, PSyntaxNode body)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_WHILE, token->row, token->col, "While"), type,
+			std::initializer_list<PSyntaxNode>({ condition })), condition(condition), body(body)
+	{
+		if (body != nullptr) children.push_back(body);
+	}
+};
+
+class ReadNode : public SyntaxNode {
+
+};
+
+class WriteNode : public SyntaxNode {
+
 };

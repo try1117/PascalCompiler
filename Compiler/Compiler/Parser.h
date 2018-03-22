@@ -14,6 +14,7 @@ private:
 	std::shared_ptr<Tokenizer> tokenizer;
 	std::string programName;
 	std::vector<PSymbolTable> tables;
+	int loopCnt = 0;
 
 	void goToNextToken();
 	PToken currentToken();
@@ -72,6 +73,7 @@ private:
 	PSyntaxNode fieldAccess(PSyntaxNode node);
 
 	PSyntaxNode ifStatement();
+	PSyntaxNode whileStatement();
 
 	PSymbol findSymbolInTables(PToken token);
 };

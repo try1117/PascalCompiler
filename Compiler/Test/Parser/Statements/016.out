@@ -1,0 +1,37 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   s : String
+
+|-- Statements
+|            |-- :=
+|            |    |-- a
+|            |    --- 0
+|            |-- :=
+|            |    |-- s
+|            |    --- 'a'
+|            --- While
+|                    |-- or
+|                    |    |-- and
+|                    |    |     |-- <
+|                    |    |     |   |-- a
+|                    |    |     |   --- 10
+|                    |    |     --- 1
+|                    |    --- <
+|                    |        |-- s
+|                    |        |   |-- s
+|                    |        --- 98
+|                    --- Statements
+|                                 |-- :=
+|                                 |    |-- a
+|                                 |    --- +
+|                                 |        |-- a
+|                                 |        --- 1
+|                                 --- :=
+|                                      |-- s
+|                                      --- +
+|                                          |-- s
+|                                          --- s

@@ -1,0 +1,19 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+|-- Statements
+|            |-- :=
+|            |    |-- a
+|            |    --- 0
+|            --- While
+|                    |-- 1
+|                    --- :=
+|                         |-- a
+|                         --- +
+|                             |-- *
+|                             |   |-- 2
+|                             |   --- a
+|                             --- 1

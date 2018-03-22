@@ -1,0 +1,5 @@
+program test;
+begin
+  while 1 do;
+  if 1 then;
+end.
