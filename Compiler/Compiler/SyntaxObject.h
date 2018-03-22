@@ -134,6 +134,14 @@ public:
 	}
 };
 
+class ContinueNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
+class BreakNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
 class ReadNode : public SyntaxNode {
 
 };

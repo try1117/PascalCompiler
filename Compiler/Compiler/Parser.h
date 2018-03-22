@@ -75,6 +75,8 @@ private:
 	PSyntaxNode ifStatement();
 	PSyntaxNode whileStatement();
 	PSyntaxNode forStatement();
+	PSyntaxNode continueStatement();
+	PSyntaxNode breakStatement();
 
 	PSymbol findSymbolInTables(PToken token);
 };

@@ -775,6 +775,10 @@ PSyntaxNode Parser::parseStatement()
 			return whileStatement();
 		case KEYWORD_FOR:
 			return forStatement();
+		case KEYWORD_CONTINUE:
+			return continueStatement();
+		case KEYWORD_BREAK:
+			return breakStatement();
 		case KEYWORD_BEGIN:
 			return compoundStatement();
 		case SEP_SEMICOLON:
@@ -930,6 +934,26 @@ PSyntaxNode Parser::forStatement()
 
 	--loopCnt;
 	return std::make_shared<ForNode>(forToken, Type::getSimpleType(Type::NIL), counter, from, to, downTo, body);
+}
+
+PSyntaxNode Parser::continueStatement()
+{
+	if (loopCnt == 0) {
+		throw LexicalException(currentToken()->row, currentToken()->col, "Continue not allowed");
+	}
+	PToken token = currentToken();
+	goToNextToken();
+	return std::make_shared<ContinueNode>(token, Type::getSimpleType(Type::NIL));
+}
+
+PSyntaxNode Parser::breakStatement()
+{
+	if (loopCnt == 0) {
+		throw LexicalException(currentToken()->row, currentToken()->col, "Break not allowed");
+	}
+	PToken token = currentToken();
+	goToNextToken();
+	return std::make_shared<BreakNode>(token, Type::getSimpleType(Type::NIL));
 }
 
 PSymbol Parser::findSymbolInTables(PToken token)

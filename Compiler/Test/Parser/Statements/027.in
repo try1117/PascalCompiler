@@ -1,0 +1,12 @@
+program test;
+var
+  i, a: integer;
+  j: char;
+begin
+  for i := 1 to 10 do begin
+    j := j + 1;
+    if j > i then break
+    else continue;
+  end;
+  continue;
+end.
