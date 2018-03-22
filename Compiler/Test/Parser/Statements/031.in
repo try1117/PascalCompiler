@@ -1,0 +1,9 @@
+program test;
+var
+  a: integer;
+  b: double;
+  c: char;
+  d: string;
+begin
+  read(a + a, b, c, d);
+end.

@@ -1,0 +1,29 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   b : Double
+
+   c : Char
+
+   d : String
+
+|-- Statements
+|            |-- Read
+|            |      |-- a
+|            |      |-- b
+|            |      |-- c
+|            |      --- d
+|            --- Write
+|                    |-- *
+|                    |   |-- 1.000000
+|                    |   --- a
+|                    |       |-- a
+|                    |-- +
+|                    |   |-- a
+|                    |   --- 25
+|                    --- +
+|                        |-- 'qwerty'
+|                        --- d

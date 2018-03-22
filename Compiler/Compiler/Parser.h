@@ -27,6 +27,7 @@ private:
 	PSyntaxNode parseExpr();
 	PSyntaxNode parseTerm();
 	PSyntaxNode parseFactor();
+	PSyntaxNode parseIdentifier(PToken token = nullptr);
 
 	PSymbol getSymbol(PToken token);
 	PType getOperationType(PType left, PType right, PToken operation);
@@ -78,4 +79,8 @@ private:
 	PSyntaxNode forStatement();
 	PSyntaxNode continueStatement();
 	PSyntaxNode breakStatement();
+
+	void expressionList(std::vector<PSyntaxNode> &expressions);
+	PSyntaxNode readWriteStatement(bool read);
+	PSyntaxNode parseFunctionCall();
 };

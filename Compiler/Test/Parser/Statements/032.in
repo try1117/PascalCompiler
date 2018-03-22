@@ -1,0 +1,9 @@
+program test;
+var
+  i: integer;
+  arr: array[1..10] of integer;
+begin
+  if (arr[1]) then i := i;
+  //read(arr[1], arr[2], arr[3]);
+  //for i := 1 to 10 do read(arr[i]);
+end.

@@ -2,7 +2,7 @@
 #include "SyntaxObject.h"
 #include "Utils.h"
 
-SyntaxNode::SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children, Category category)
+SyntaxNode::SyntaxNode(PToken token, PType type, std::vector<PSyntaxNode> children, Category category)
 	: token(token), type(type), children(children), category(category)
 {
 }

@@ -23,17 +23,20 @@ public:
 	enum Category {
 		NIL,
 		CONST_NODE,
+		VAR_NODE,
 	} category;
 
 	SyntaxNode() {}
-	SyntaxNode(PToken token, PType type, std::initializer_list<PSyntaxNode> children = {}, Category category = NIL);
+	SyntaxNode(PToken token, PType type, std::vector<PSyntaxNode> children = {}, Category category = NIL);
 	void print(std::string &output, std::string prefix = "", bool end = true);
 	std::string toString(std::string prefix = "");
 };
 
 class VarNode : public SyntaxNode {
 public:
-	using SyntaxNode::SyntaxNode;
+	VarNode(PToken token, PType type, std::vector<PSyntaxNode> children = {}, Category category = VAR_NODE)
+		: SyntaxNode(token, type, children, category)
+	{}
 };
 
 class UnaryMinusNode : public SyntaxNode {
@@ -52,7 +55,7 @@ class ConstNode : public SyntaxNode {
 public:
 	PIdentifierValue value;
 	ConstNode(PToken token, PType type, PIdentifierValue value)
-		: SyntaxNode(token, type, std::initializer_list<PSyntaxNode>(), CONST_NODE), value(value)
+		: SyntaxNode(token, type, std::vector<PSyntaxNode>(), CONST_NODE), value(value)
 	{
 		token->text = value->toString();
 	}
@@ -64,7 +67,7 @@ class TypedConstNode : public SyntaxNode {
 public:
 	PType type;
 	TypedConstNode(PType type, std::string name)
-		: SyntaxNode(std::make_shared<Token>(IDENTIFIER, 0, 0, name), type, std::initializer_list<PSyntaxNode>(), CONST_NODE)
+		: SyntaxNode(std::make_shared<Token>(IDENTIFIER, 0, 0, name), type, std::vector<PSyntaxNode>(), CONST_NODE)
 	{}
 };
 
@@ -72,27 +75,27 @@ class CastNode : public SyntaxNode {
 public:
 	PType newType;
 	CastNode(PSyntaxNode node, PType newType)
-		: SyntaxNode(node->token, node->type, std::initializer_list<PSyntaxNode>({ node })), newType(newType)
+		: SyntaxNode(node->token, node->type, std::vector<PSyntaxNode>({ node })), newType(newType)
 	{}
 };
 
 class IndexNode : public SyntaxNode {
 public:
-	IndexNode(PType type, std::initializer_list<PSyntaxNode> children)
+	IndexNode(PType type, std::vector<PSyntaxNode> children)
 		: SyntaxNode(std::make_shared<Token>(SEP_BRACKET_SQUARE_LEFT, 0, 0, "[]"), type, children)
 	{}
 };
 
 class FieldAccessNode : public SyntaxNode {
 public:
-	FieldAccessNode(PType type, std::initializer_list<PSyntaxNode> children)
+	FieldAccessNode(PType type, std::vector<PSyntaxNode> children)
 		: SyntaxNode(std::make_shared<Token>(SEP_DOT, 0, 0, "."), type, children)
 	{}
 };
 
 class AssignStatement : public SyntaxNode {
 public:
-	AssignStatement(PType type, std::initializer_list<PSyntaxNode> children)
+	AssignStatement(PType type, std::vector<PSyntaxNode> children)
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_ASSIGN, 0, 0, ":="), type, children)
 	{}
 };
@@ -115,7 +118,7 @@ public:
 	PSyntaxNode condition, body;
 	WhileNode(PToken token, PType type, PSyntaxNode condition, PSyntaxNode body)
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_WHILE, token->row, token->col, "While"), type,
-			std::initializer_list<PSyntaxNode>({ condition })), condition(condition), body(body)
+			std::vector<PSyntaxNode>({ condition })), condition(condition), body(body)
 	{
 		if (body != nullptr) children.push_back(body);
 	}
@@ -127,7 +130,7 @@ public:
 	bool downTo;
 	ForNode(PToken token, PType type, PSyntaxNode counter, PSyntaxNode from, PSyntaxNode to, bool downTo, PSyntaxNode body)
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_FOR, token->row, token->col, "For"), type,
-			std::initializer_list<PSyntaxNode>({ counter, from, to })),
+			std::vector<PSyntaxNode>({ counter, from, to })),
 		counter(counter), from(from), to(to), downTo(downTo), body(body)
 	{
 		if (body != nullptr) children.push_back(body);
@@ -143,9 +146,15 @@ class BreakNode : public SyntaxNode {
 };
 
 class ReadNode : public SyntaxNode {
-
+public:
+	ReadNode(PToken token, PType type, std::vector<PSyntaxNode> children)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_READ, token->row, token->col, "Read"), type, children)
+	{}
 };
 
 class WriteNode : public SyntaxNode {
-
+public:
+	WriteNode(PToken token, PType type, std::vector<PSyntaxNode> children)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_WRITE, token->row, token->col, "Write"), type, children)
+	{}
 };

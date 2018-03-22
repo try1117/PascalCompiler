@@ -1,0 +1,10 @@
+program test;
+var
+  a: integer;
+  b: double;
+  c: char;
+  d: string;
+begin
+  read(a, b, c, d);
+  write(1.0 * a, a + 5 * 5, 'qwerty' + d);
+end.
