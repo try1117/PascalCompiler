@@ -45,6 +45,17 @@ void Parser::requireThenNext(std::initializer_list<TokenType> types)
 	goToNextToken();
 }
 
+PSymbol Parser::findSymbolInTables(PToken token)
+{
+	for (int i = (int)tables.size() - 1; i >= 0; --i) {
+		PSymbol sym = tables[i]->getSymbol(token);
+		if (sym != nullptr) {
+			return sym;
+		}
+	}
+	throw LexicalException(token->row, token->col, "Identifier not found \"" + token->text + "\"");
+}
+
 PSyntaxNode Parser::parseLogical()
 {
 	auto node = parseExpr();
@@ -954,15 +965,4 @@ PSyntaxNode Parser::breakStatement()
 	PToken token = currentToken();
 	goToNextToken();
 	return std::make_shared<BreakNode>(token, Type::getSimpleType(Type::NIL));
-}
-
-PSymbol Parser::findSymbolInTables(PToken token)
-{
-	for (int i = (int)tables.size() - 1; i >= 0; --i) {
-		PSymbol sym = tables[i]->getSymbol(token);
-		if (sym != nullptr) {
-			return sym;
-		}
-	}
-	throw LexicalException(token->row, token->col, "Identifier not found \"" + token->text + "\"");
 }

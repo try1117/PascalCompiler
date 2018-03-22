@@ -21,6 +21,7 @@ private:
 	TokenType currentTokenType();
 	void requireCurrent(std::initializer_list<TokenType> types);
 	void requireThenNext(std::initializer_list<TokenType> types);
+	PSymbol findSymbolInTables(PToken token);
 
 	PSyntaxNode parseLogical();
 	PSyntaxNode parseExpr();
@@ -77,6 +78,4 @@ private:
 	PSyntaxNode forStatement();
 	PSyntaxNode continueStatement();
 	PSyntaxNode breakStatement();
-
-	PSymbol findSymbolInTables(PToken token);
 };
