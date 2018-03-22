@@ -81,15 +81,17 @@ public:
 
 class IndexNode : public SyntaxNode {
 public:
-	IndexNode(PType type, std::vector<PSyntaxNode> children)
-		: SyntaxNode(std::make_shared<Token>(SEP_BRACKET_SQUARE_LEFT, 0, 0, "[]"), type, children)
+	PToken variableToken;
+	IndexNode(PType type, std::vector<PSyntaxNode> children, PToken variableToken)
+		: SyntaxNode(std::make_shared<Token>(SEP_BRACKET_SQUARE_LEFT, 0, 0, "[]"), type, children, VAR_NODE), variableToken(variableToken)
 	{}
 };
 
 class FieldAccessNode : public SyntaxNode {
 public:
-	FieldAccessNode(PType type, std::vector<PSyntaxNode> children)
-		: SyntaxNode(std::make_shared<Token>(SEP_DOT, 0, 0, "."), type, children)
+	PToken variableToken;
+	FieldAccessNode(PType type, std::vector<PSyntaxNode> children, PToken variableToken)
+		: SyntaxNode(std::make_shared<Token>(SEP_DOT, 0, 0, "."), type, children, VAR_NODE), variableToken(variableToken)
 	{}
 };
 

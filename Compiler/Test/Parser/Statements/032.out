@@ -1,1 +1,34 @@
-Syntax exception in position (6,10) - Expected ")" but found "["
+test : function()
+   resultType : Nil
+
+test declarations:
+   i : Integer
+
+   arr : Array [1, 10] of Integer
+
+|-- Statements
+|            |-- If
+|            |    |-- []
+|            |    |    |-- arr
+|            |    |    --- 5
+|            |    --- :=
+|            |         |-- i
+|            |         --- i
+|            |-- Read
+|            |      |-- []
+|            |      |    |-- arr
+|            |      |    --- 1
+|            |      |-- []
+|            |      |    |-- arr
+|            |      |    --- 2
+|            |      --- []
+|            |           |-- arr
+|            |           --- 3
+|            --- For
+|                  |-- i
+|                  |-- 1
+|                  |-- 10
+|                  --- Read
+|                         |-- []
+|                         |    |-- arr
+|                         |    --- i

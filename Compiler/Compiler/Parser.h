@@ -71,8 +71,8 @@ private:
 	PSyntaxNode parseStatement();
 
 	PSyntaxNode assignStatement();
-	PSyntaxNode indexedVariable(PSyntaxNode node);
-	PSyntaxNode fieldAccess(PSyntaxNode node);
+	PSyntaxNode indexedVariable(PSyntaxNode node, PToken variableToken);
+	PSyntaxNode fieldAccess(PSyntaxNode node, PToken variableToken);
 
 	PSyntaxNode ifStatement();
 	PSyntaxNode whileStatement();

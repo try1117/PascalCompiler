@@ -178,24 +178,25 @@ PSyntaxNode Parser::parseFactor()
 
 PSyntaxNode Parser::parseIdentifier(PToken token)
 {
-	if (token == nullptr) token = currentToken();
+	if (token == nullptr) {
+		token = currentToken();
+		goToNextToken();
+	}
+
 	PSymbol symbol = findSymbolInTables(token);
 	PSyntaxNode node = std::make_shared<VarNode>(token, symbol->type);
 	
 	if (symbol->type->category == Type::NIL) {
 		throw LexicalException(token->row, token->col, "Variable identifier expected");
 	}
-
+	
 	if (symbol->type->category == Type::ARRAY) {
-		goToNextToken();
-		node = indexedVariable(node);
+		node = indexedVariable(node, token);
 	}
 	else if (symbol->type->category == Type::RECORD) {
-		goToNextToken();
-		node = fieldAccess(node);
+		node = fieldAccess(node, token);
 	}
 	else if (symbol->type->category == Type::FUNCTION) {
-		goToNextToken();
 		node = parseFunctionCall();
 	}
 	
@@ -839,7 +840,7 @@ PSyntaxNode Parser::assignStatement()
 		throw LexicalException(token->row, token->col, "Variable identifier expected");
 	}
 	PSyntaxNode node = parseIdentifier();
-	goToNextToken();
+	//goToNextToken();
 
 	requireThenNext({ KEYWORD_ASSIGN });
 	PSyntaxNode expr = parseLogical();
@@ -850,7 +851,7 @@ PSyntaxNode Parser::assignStatement()
 	return std::make_shared<AssignStatement>(node->type, std::initializer_list<PSyntaxNode>({ node, expr }));
 }
 
-PSyntaxNode Parser::indexedVariable(PSyntaxNode node)
+PSyntaxNode Parser::indexedVariable(PSyntaxNode node, PToken variableToken)
 {
 	while (currentTokenType() == SEP_BRACKET_SQUARE_LEFT) {
 		if (node->type->category != Type::ARRAY) {
@@ -872,18 +873,18 @@ PSyntaxNode Parser::indexedVariable(PSyntaxNode node)
 			}
 		}
 
-		node = std::make_shared<IndexNode>(arr->elementType, std::initializer_list<PSyntaxNode>({node, expr}));
+		node = std::make_shared<IndexNode>(arr->elementType, std::initializer_list<PSyntaxNode>({node, expr}), variableToken);
 		requireThenNext({ SEP_BRACKET_SQUARE_RIGHT });
 	}
 
 	if (node->type->category == Type::RECORD) {
-		return fieldAccess(node);
+		return fieldAccess(node, variableToken);
 	}
 
 	return node;
 }
 
-PSyntaxNode Parser::fieldAccess(PSyntaxNode node)
+PSyntaxNode Parser::fieldAccess(PSyntaxNode node, PToken variableToken)
 {
 	while (currentTokenType() == SEP_DOT) {
 		if (node->type->category != Type::RECORD) {
@@ -901,12 +902,12 @@ PSyntaxNode Parser::fieldAccess(PSyntaxNode node)
 		}
 
 		PSyntaxNode varNode = std::make_shared<VarNode>(field, symbol->type);
-		node = std::make_shared<FieldAccessNode>(symbol->type, std::initializer_list<PSyntaxNode>({ node, varNode }));
+		node = std::make_shared<FieldAccessNode>(symbol->type, std::initializer_list<PSyntaxNode>({ node, varNode }), variableToken);
 		goToNextToken();
 	}
 
 	if (node->type->category == Type::ARRAY) {
-		return indexedVariable(node);
+		return indexedVariable(node, variableToken);
 	}
 	return node;
 }
@@ -1009,7 +1010,22 @@ PSyntaxNode Parser::readWriteStatement(bool read)
 	expressionList(children);
 	if (read) {
 		for (auto child : children) {
-			if (child->category != SyntaxNode::VAR_NODE || getSymbol(child->token)->category == Symbol::CONST) {
+			bool isConst = false;
+			if (child->category == SyntaxNode::VAR_NODE) {
+				if (child->token->type == SEP_BRACKET_SQUARE_LEFT) {
+					auto arr = std::static_pointer_cast<IndexNode>(child);
+					isConst = getSymbol(arr->variableToken)->category == Symbol::CONST;
+				}
+				else if (child->token->type == SEP_DOT) {
+					auto rec = std::static_pointer_cast<FieldAccessNode>(child);
+					isConst = getSymbol(rec->variableToken)->category == Symbol::CONST;
+				}
+				else {
+					isConst = getSymbol(child->token)->category == Symbol::CONST;
+				}
+			}
+
+			if (child->category != SyntaxNode::VAR_NODE || isConst) {
 				throw LexicalException(token->row, token->col, "Variable identifier expected");
 			}
 		}

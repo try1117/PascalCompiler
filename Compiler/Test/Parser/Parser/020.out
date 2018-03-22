@@ -1,8 +1,1 @@
-test : function()
-   resultType : Nil
-
-test declarations:
-   a : Array [1, 10] of Array [2, 20] of Integer
-
-   b : Array [-10, -100] of Array [-100, 100] of Array [0, 0] of Double
-
+Lexical exception in position (5,14) - High range limit < low range limit
