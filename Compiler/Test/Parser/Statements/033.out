@@ -1,0 +1,5 @@
+Lexical exception in position (10,5) - Can't read or write variables of type
+Record
+   a : Array [97, 122] of Array [-10, 10] of String
+   d : Double
+end

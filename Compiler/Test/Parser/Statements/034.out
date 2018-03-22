@@ -1,0 +1,38 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   recArr : Array [1, 5] of Record
+      a : Array [97, 122] of Array [-10, 10] of String
+      d : Double
+   end
+
+   i : Integer
+
+|-- Statements
+|            |-- For
+|            |     |-- i
+|            |     |-- 1
+|            |     |-- 5
+|            |     --- Statements
+|            |                  |-- Write
+|            |                  |       |-- /
+|            |                  |       |   |-- .
+|            |                  |       |   |   |-- []
+|            |                  |       |   |   |    |-- recArr
+|            |                  |       |   |   |    --- i
+|            |                  |       |   |   --- d
+|            |                  |       |   --- 25.000000
+|            |                  |       --- +
+|            |                  |           |-- +
+|            |                  |           |   |-- 'c'
+|            |                  |           |   --- []
+|            |                  |           |        |-- []
+|            |                  |           |        |    |-- .
+|            |                  |           |        |    |   |-- []
+|            |                  |           |        |    |   |    |-- recArr
+|            |                  |           |        |    |   |    --- i
+|            |                  |           |        |    |   --- a
+|            |                  |           |        |    --- 120
+|            |                  |           |        --- -10
+|            |                  |           --- 'qwerty'

@@ -1008,10 +1008,14 @@ PSyntaxNode Parser::readWriteStatement(bool read)
 	goToNextToken();
 	std::vector<PSyntaxNode> children;
 	expressionList(children);
-	if (read) {
-		for (auto child : children) {
-			bool isConst = false;
-			if (child->category == SyntaxNode::VAR_NODE) {
+
+	for (auto child : children) {
+		bool isConst = false;
+		if (child->category == SyntaxNode::VAR_NODE) {
+			if (!Type::simpleCategories.count(child->type->category)) {
+				throw LexicalException(token->row, token->col, "Can't read or write variables of type\n" + child->type->toString());
+			}
+			if (read) {
 				if (child->token->type == SEP_BRACKET_SQUARE_LEFT) {
 					auto arr = std::static_pointer_cast<IndexNode>(child);
 					isConst = getSymbol(arr->variableToken)->category == Symbol::CONST;
@@ -1024,11 +1028,14 @@ PSyntaxNode Parser::readWriteStatement(bool read)
 					isConst = getSymbol(child->token)->category == Symbol::CONST;
 				}
 			}
-
-			if (child->category != SyntaxNode::VAR_NODE || isConst) {
-				throw LexicalException(token->row, token->col, "Variable identifier expected");
-			}
 		}
+
+		if (read && (child->category != SyntaxNode::VAR_NODE || isConst)) {
+			throw LexicalException(token->row, token->col, "Variable identifier expected");
+		}
+	}
+	
+	if (read) {
 		return std::make_shared<ReadNode>(token, Type::getSimpleType(Type::NIL), children);
 	}
 	else {
