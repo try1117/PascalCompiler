@@ -1,0 +1,41 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   i : Integer
+
+   a : Integer
+
+   j : Char
+
+|-- Statements
+|            |-- For
+|            |     |-- i
+|            |     |-- a
+|            |     |-- +
+|            |     |   |-- *
+|            |     |   |   |-- 2
+|            |     |   |   --- a
+|            |     |   --- div
+|            |     |         |-- 3
+|            |     |         --- i
+|            |     --- For
+|            |           |-- j
+|            |           |-- 'z'
+|            |           |-- 'a'
+|            |           --- If
+|            |                |-- =
+|            |                |   |-- i
+|            |                |   --- j
+|            |                |       |-- j
+|            |                --- Statements
+|            |                             |-- :=
+|            |                             |    |-- a
+|            |                             |    --- +
+|            |                             |        |-- a
+|            |                             |        --- 1
+|            |                             --- :=
+|            |                                  |-- a
+|            |                                  --- *
+|            |                                      |-- a
+|            |                                      --- 2

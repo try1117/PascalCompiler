@@ -1,0 +1,13 @@
+program test;
+var
+  i, a: integer;
+  j: char;
+begin
+  for i := a downto 2 * a + 3 div i do
+    for j := 'z' downto 'a' do
+      if i = j then
+      begin
+        a := a + 1;
+        a := a * 2;
+      end;
+end.

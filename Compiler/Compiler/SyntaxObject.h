@@ -121,6 +121,19 @@ public:
 	}
 };
 
+class ForNode : public SyntaxNode {
+public:
+	PSyntaxNode counter, from, to, body;
+	bool downTo;
+	ForNode(PToken token, PType type, PSyntaxNode counter, PSyntaxNode from, PSyntaxNode to, bool downTo, PSyntaxNode body)
+		: SyntaxNode(std::make_shared<Token>(KEYWORD_FOR, token->row, token->col, "For"), type,
+			std::initializer_list<PSyntaxNode>({ counter, from, to })),
+		counter(counter), from(from), to(to), downTo(downTo), body(body)
+	{
+		if (body != nullptr) children.push_back(body);
+	}
+};
+
 class ReadNode : public SyntaxNode {
 
 };

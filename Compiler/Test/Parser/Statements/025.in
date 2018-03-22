@@ -1,0 +1,9 @@
+program test;
+var
+  i, a: integer;
+  j: char;
+begin
+  for i := 1 to begin
+    j := j + 1;
+  end;
+end.

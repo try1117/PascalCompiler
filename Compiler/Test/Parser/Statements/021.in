@@ -1,0 +1,12 @@
+program test;
+var
+  i, a: integer;
+  j: char;
+begin
+  for i := 100 downto -100 do
+    for j := 'a' to 'z' do
+    begin
+      a := a + 1;
+      a := a * 2;
+    end;
+end.

@@ -773,6 +773,8 @@ PSyntaxNode Parser::parseStatement()
 			return ifStatement();
 		case KEYWORD_WHILE:
 			return whileStatement();
+		case KEYWORD_FOR:
+			return forStatement();
 		case KEYWORD_BEGIN:
 			return compoundStatement();
 		case SEP_SEMICOLON:
@@ -901,6 +903,33 @@ PSyntaxNode Parser::whileStatement()
 	PSyntaxNode body = parseStatement();
 	--loopCnt;
 	return std::make_shared<WhileNode>(whileToken, Type::getSimpleType(Type::NIL), condition, body);
+}
+
+PSyntaxNode Parser::forStatement()
+{
+	++loopCnt;
+	PToken forToken = currentToken();
+	goToNextToken();
+	requireCurrent({ IDENTIFIER });
+	PSyntaxNode counter = std::make_shared<VarNode>(currentToken(), getSymbol(currentToken())->type);
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), counter->type);
+	
+	goToNextToken();
+	requireThenNext({ KEYWORD_ASSIGN });
+	PSyntaxNode from = parseLogical();
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), from->type);
+
+	requireCurrent({ KEYWORD_TO, KEYWORD_DOWNTO });
+	bool downTo = (currentTokenType() == KEYWORD_DOWNTO);
+	goToNextToken();
+
+	PSyntaxNode to = parseLogical();
+	requireTypesCompatibility(Type::getSimpleType(Type::INTEGER), to->type);
+	requireThenNext({ KEYWORD_DO });
+	PSyntaxNode body = parseStatement();
+
+	--loopCnt;
+	return std::make_shared<ForNode>(forToken, Type::getSimpleType(Type::NIL), counter, from, to, downTo, body);
 }
 
 PSymbol Parser::findSymbolInTables(PToken token)
