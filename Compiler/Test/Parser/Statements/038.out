@@ -1,0 +1,16 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   pi : Const Double
+    |-- 3.141593
+
+   pi2 : Double
+     |-- 6.283185
+
+|-- Statements
+|            |-- Write
+|            |       |-- 'pi + 1 = '
+|            |       |-- 4.141593
+|            |       |-- '2 * pi = '
+|            |       --- pi2

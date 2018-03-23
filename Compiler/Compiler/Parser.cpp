@@ -149,7 +149,7 @@ PSyntaxNode Parser::parseFactor()
 		return res;
 	}
 	else if (token->type == IDENTIFIER) {
-		if (instanceOfConstNode(getSymbol(token)->value)) {
+		if (instanceOfConstNode(getSymbol(token)->value) && getSymbol(token)->category == Symbol::CONST) {
 			// deep copy this symbol, as we don't want to change it in symbol table
 			return deepCopyConstNode(getSymbol(token)->value);
 		}
@@ -611,10 +611,13 @@ PSyntaxNode Parser::typedConstant(PType type)
 		if (instanceOfConstNode(node)) {
 			return castConstNode(node, type);
 		}
-		if (node->type->category != type->category) {
-			return std::make_shared<CastNode>(node, type);
+		else {
+			throw LexicalException(node->token->row, node->token->col, "Illegal expression");
 		}
-		return node;
+		//if (node->type->category != type->category) {
+		//	return std::make_shared<CastNode>(node, type);
+		//}
+		//return node;
 	}
 	else if (type->category == Type::ARRAY) {
 		auto arrayType = std::static_pointer_cast<ArrayType>(type);
@@ -1013,7 +1016,7 @@ PSyntaxNode Parser::readWriteStatement(bool read)
 		bool isConst = false;
 		if (child->category == SyntaxNode::VAR_NODE) {
 			if (!Type::simpleCategories.count(child->type->category)) {
-				throw LexicalException(token->row, token->col, "Can't read or write variables of type\n" + child->type->toString());
+				throw LexicalException(token->row, token->col, "Can't read or write variables of type " + child->type->toString());
 			}
 			if (read) {
 				if (child->token->type == SEP_BRACKET_SQUARE_LEFT) {

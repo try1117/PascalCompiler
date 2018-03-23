@@ -1,1 +1,15 @@
-Lexical exception in position (6,8) - Index out of range
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Array [1, 10] of Integer
+
+   idx : Integer
+     |-- 0
+
+|-- Statements
+|            |-- :=
+|            |    |-- []
+|            |    |    |-- a
+|            |    |    --- idx
+|            |    --- 25

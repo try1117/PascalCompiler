@@ -1,0 +1,4 @@
+Lexical exception in position (10,20) - Expected array but found Record
+   a : Array [97, 122] of Array [-10, 10] of String
+   d : Double
+end

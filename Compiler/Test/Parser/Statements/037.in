@@ -1,0 +1,12 @@
+program test;
+var
+  recArr: array[1..5] of record
+    a: array['a'..'z'] of array[-10..10] of string;
+    d: double;
+  end;
+  i: integer;
+begin
+  for i := 1 to 5 do begin
+    write(recArr[i].a['z']);
+  end;
+end.

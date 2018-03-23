@@ -1,0 +1,8 @@
+program test;
+const
+  pi: double = 3.14159265358979;
+var
+  pi2: double = 2 * pi;
+begin
+  write('pi + 1 = ', pi + 1, '2 * pi = ', pi2);
+end.
