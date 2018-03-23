@@ -45,17 +45,6 @@ void Parser::requireThenNext(std::initializer_list<TokenType> types)
 	goToNextToken();
 }
 
-PSymbol Parser::findSymbolInTables(PToken token)
-{
-	for (int i = (int)tables.size() - 1; i >= 0; --i) {
-		PSymbol sym = tables[i]->getSymbol(token);
-		if (sym != nullptr) {
-			return sym;
-		}
-	}
-	throw LexicalException(token->row, token->col, "Identifier not found \"" + token->text + "\"");
-}
-
 PSyntaxNode Parser::parseLogical()
 {
 	auto node = parseExpr();
@@ -183,7 +172,7 @@ PSyntaxNode Parser::parseIdentifier(PToken token)
 		goToNextToken();
 	}
 
-	PSymbol symbol = findSymbolInTables(token);
+	PSymbol symbol = getSymbol(token);
 	PSyntaxNode node = std::make_shared<VarNode>(token, symbol->type);
 	
 	if (symbol->type->category == Type::NIL) {
@@ -210,7 +199,7 @@ PSymbol Parser::getSymbol(PToken token)
 			return tables[i]->getSymbol(token);
 		}
 	}
-	throw LexicalException(token->row, token->col, "Identifier " + token->text + " not found");
+	throw LexicalException(token->row, token->col, "Identifier not found \"" + token->text + "\"");
 }
 
 PType Parser::getOperationType(PType left, PType right, PToken operation)
@@ -800,7 +789,7 @@ PSyntaxNode Parser::parseStatement()
 	switch (currentTokenType()) {
 		case IDENTIFIER: {
 			PToken token = currentToken();
-			PSymbol symbol = findSymbolInTables(token);
+			PSymbol symbol = getSymbol(token);
 			if (symbol->category == Symbol::CONST) {
 				throw LexicalException(token->row, token->col, "Can't assign values to const variable");
 			}
@@ -837,7 +826,7 @@ PSyntaxNode Parser::parseStatement()
 PSyntaxNode Parser::assignStatement()
 {
 	PToken token = currentToken();
-	PSymbol symbol = findSymbolInTables(token);
+	PSymbol symbol = getSymbol(token);
 	
 	if (symbol->type->category == Type::FUNCTION) {
 		throw LexicalException(token->row, token->col, "Variable identifier expected");
