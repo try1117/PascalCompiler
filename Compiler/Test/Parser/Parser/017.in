@@ -1,7 +1,6 @@
 program test;
-var
-  a : integer = not 0;
 const
+  a : integer = not 0;
   b : double = not(a - 1);
   c : integer = not a - 5;
   d : char = a + -1 + 5 + '0' + 2;

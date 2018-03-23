@@ -2,7 +2,7 @@ test : function()
    resultType : Nil
 
 test declarations:
-   a : Integer
+   a : Const Integer
    |-- 5
 
    b : Const Double

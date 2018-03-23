@@ -1,7 +1,6 @@
 program test;
-var
-  a : integer = 5;
 const
+  a : integer = 5;
   b : double = a - 2.0;
 var
   c : double = a + b;
