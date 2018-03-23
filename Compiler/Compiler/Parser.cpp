@@ -139,8 +139,12 @@ PSyntaxNode Parser::parseFactor()
 	}
 	else if (token->type == IDENTIFIER) {
 		if (instanceOfConstNode(getSymbol(token)->value) && getSymbol(token)->category == Symbol::CONST) {
-			// deep copy this symbol, as we don't want to change it in symbol table
-			return deepCopyConstNode(getSymbol(token)->value);
+			// it can have either simple or complex type
+			PSyntaxNode node = parseIdentifier(token);
+			if (!node->children.empty()) {
+				node = constNodeAccess(node);
+			}
+			return deepCopyNode(node);
 		}
 		return parseIdentifier(token);
 	}
@@ -173,23 +177,59 @@ PSyntaxNode Parser::parseIdentifier(PToken token)
 	}
 
 	PSymbol symbol = getSymbol(token);
-	PSyntaxNode node = std::make_shared<VarNode>(token, symbol->type);
-	
+	PSyntaxNode node;
+	if (symbol->value != nullptr && symbol->category == Symbol::CONST)
+		node = std::make_shared<ConstNode>(token, symbol->type, std::static_pointer_cast<ConstNode>(symbol->value)->value);
+	else
+		node = std::make_shared<VarNode>(token, symbol->type);
+
 	if (symbol->type->category == Type::NIL) {
 		throw LexicalException(token->row, token->col, "Variable identifier expected");
 	}
 	
 	if (symbol->type->category == Type::ARRAY) {
-		node = indexedVariable(node, token);
+		return indexedVariable(node, token);
 	}
 	else if (symbol->type->category == Type::RECORD) {
-		node = fieldAccess(node, token);
+		return fieldAccess(node, token);
 	}
 	else if (symbol->type->category == Type::FUNCTION) {
-		node = parseFunctionCall();
+		return parseFunctionCall();
 	}
 	
 	return node;
+}
+
+PSyntaxNode Parser::constNodeAccess(PSyntaxNode node)
+{
+	//node->type->category != Type::NIL && Type::simpleCategories.count(node->type->category)) {
+	if (node->children.empty()) {
+		return getSymbol(node->token)->value;
+	}
+	// array
+	else if (node->token->type == SEP_BRACKET_SQUARE_LEFT) {
+		auto arrNode = constNodeAccess(node->children[0]);
+		auto arrType = std::static_pointer_cast<ArrayType>(arrNode->type);
+		int idx = std::static_pointer_cast<ConstNode>(node->children[1])->value->toInteger();
+		return arrNode->children[idx - arrType->left->value->toInteger()];
+	}
+	// record
+	else if (node->token->type == SEP_DOT) {
+		auto recNode = constNodeAccess(node->children[0]);
+		auto recType = std::static_pointer_cast<RecordType>(recNode->type);
+		//auto tmp = std::static_pointer_cast<ConstNode>(node->children[1]);
+
+		std::string field = node->children[1]->token->text;//std::static_pointer_cast<ConstNode>(node->children[1])->value->toString();
+		int idx;
+		for (idx = 0; idx < recType->fields->symbolsArray.size(); ++idx) {
+			if (recType->fields->symbolsArray[idx]->token->text == field)
+				break;
+		}
+		
+		return recNode->children[idx];
+		//return recType->fields->getSymbol(std::make_shared<Token>(UNDEFINED, 0, 0, field));
+	}
+	throw LexicalException(node->token->row, node->token->col, "Illegal expression");
 }
 
 PSymbol Parser::getSymbol(PToken token)
@@ -478,14 +518,25 @@ PType Parser::parseRecordType()
 	return std::make_shared<RecordType>(fields);
 }
 
-std::shared_ptr<ConstNode> Parser::deepCopyConstNode(PSyntaxNode node)
+//std::shared_ptr<ConstNode>
+PSyntaxNode Parser::deepCopyNode(PSyntaxNode node)
 {
-	auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(node));
-	res->value = std::make_shared<IdentifierValue>(*res->value);
-	res->value->get = res->value->cloneValue();
-	res->token = std::make_shared<Token>(*res->token);
-	res->type = std::make_shared<Type>(*res->type);
-	return res;
+	if (node->category == SyntaxNode::CONST_NODE) {
+		auto res = std::make_shared<ConstNode>(*std::static_pointer_cast<ConstNode>(node));
+		res->token = std::make_shared<Token>(*res->token);
+		res->type = std::make_shared<Type>(*res->type);
+		if (res->value != nullptr) {
+			res->value = std::make_shared<IdentifierValue>(*res->value);
+			res->value->get = res->value->cloneValue();
+		}
+		return res;
+	}
+	else {
+		auto res = PSyntaxNode();
+		res->token = std::make_shared<Token>(*res->token);
+		res->type = std::make_shared<Type>(*res->type);
+		return res;
+	}
 }
 
 PSyntaxNode Parser::parseConstValue(std::vector<PToken> identifiers, PType type)

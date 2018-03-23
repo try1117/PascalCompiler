@@ -1,0 +1,18 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Const Array [1, 5] of Integer
+   |-- Array
+   |       |-- 1
+   |       |-- 2
+   |       |-- 3
+   |       |-- 4
+   |       --- 5
+
+   b : Const Integer
+   |-- 10
+
+|-- Statements
+|            |-- Write
+|            |       |-- 11

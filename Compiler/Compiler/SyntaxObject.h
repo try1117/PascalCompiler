@@ -57,7 +57,8 @@ public:
 	ConstNode(PToken token, PType type, PIdentifierValue value)
 		: SyntaxNode(token, type, std::vector<PSyntaxNode>(), CONST_NODE), value(value)
 	{
-		token->text = value->toString();
+		if (value != nullptr)
+			token->text = value->toString();
 	}
 };
 

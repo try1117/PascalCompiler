@@ -1,0 +1,49 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Const Array [1, 5] of Integer
+   |-- Array
+   |       |-- 1
+   |       |-- 2
+   |       |-- 3
+   |       |-- 4
+   |       --- 5
+
+   b : Const Integer
+   |-- 2
+
+   arrOfRec : Const Array [1, 2] of Record
+      name : String
+      arr : Array [3, 5] of Double
+      age : Integer
+   end
+          |-- Array
+          |       |-- Record
+          |       |        |-- 'Alex'
+          |       |        |-- Array
+          |       |        |       |-- 2.000000
+          |       |        |       |-- 6.000000
+          |       |        |       --- 3.141500
+          |       |        --- 28
+          |       --- Record
+          |                |-- 'John'
+          |                |-- Array
+          |                |       |-- 100.000000
+          |                |       |-- 200.000000
+          |                |       --- 300.000000
+          |                --- 40
+
+|-- Statements
+|            |-- Write
+|            |       |-- 'Alex'
+|            |       |-- 2.000000
+|            |       |-- 6.000000
+|            |       |-- 3.141500
+|            |       --- 28
+|            --- Write
+|                    |-- 'John'
+|                    |-- 100.000000
+|                    |-- 200.000000
+|                    |-- 300.000000
+|                    --- 40

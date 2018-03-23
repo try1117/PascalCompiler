@@ -26,7 +26,9 @@ private:
 	PSyntaxNode parseExpr();
 	PSyntaxNode parseTerm();
 	PSyntaxNode parseFactor();
+
 	PSyntaxNode parseIdentifier(PToken token = nullptr);
+	PSyntaxNode constNodeAccess(PSyntaxNode node);
 
 	PSymbol getSymbol(PToken token);
 	PType getOperationType(PType left, PType right, PToken operation);
@@ -46,7 +48,7 @@ private:
 	PType parseArrayType();
 	PType parseRecordType();
 
-	std::shared_ptr<ConstNode> deepCopyConstNode(PSyntaxNode node);
+	PSyntaxNode deepCopyNode(PSyntaxNode node);
 	PSyntaxNode parseConstValue(std::vector<PToken> identifiers, PType type);
 	void variableDeclarationPart();
 	std::vector<PToken> identifierList();

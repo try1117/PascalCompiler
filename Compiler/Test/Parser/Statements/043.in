@@ -1,0 +1,17 @@
+program test;
+const
+  a: array[1..5] of integer = (1, 2, 3, 4, 5);
+  b: integer = a[2];
+  
+  arrOfRec: array[1..2] of record
+    name: string;
+    arr: array[3..5] of double;
+    age: integer;
+  end = (
+    (name: 'Alex'; arr: (b, a[2] * a[3], 3.1415); age: 28),
+    (name: 'John'; arr: (100, 200, 300); age: 40)
+  );
+begin
+  write(arrOfRec[1].name, arrOfRec[1].arr[3], arrOfRec[1].arr[4], arrOfRec[1].arr[5], arrOfRec[1].age);
+  write(arrOfRec[2].name, arrOfRec[2].arr[3], arrOfRec[2].arr[4], arrOfRec[2].arr[5], arrOfRec[2].age);
+end.

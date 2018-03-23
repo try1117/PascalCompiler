@@ -1,0 +1,9 @@
+program test;
+const
+  arrOfRec: array[1..2] of record
+    arr: array[3..4] of double;
+  end = ((arr: (10, 20)), (arr: (100, 200)));
+begin
+  write(arrOfRec[1].arr[3], arrOfRec[1].arr[4]);
+  write(arrOfRec[2].arr[3], arrOfRec[2].arr[4]);
+end.

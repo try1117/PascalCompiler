@@ -1,0 +1,24 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   arrOfRec : Const Array [1, 2] of Record
+      arr : Array [3, 4] of Double
+   end
+          |-- Array
+          |       |-- Record
+          |       |        |-- Array
+          |       |        |       |-- 10.000000
+          |       |        |       --- 20.000000
+          |       --- Record
+          |                |-- Array
+          |                |       |-- 100.000000
+          |                |       --- 200.000000
+
+|-- Statements
+|            |-- Write
+|            |       |-- 10.000000
+|            |       --- 20.000000
+|            --- Write
+|                    |-- 100.000000
+|                    --- 200.000000

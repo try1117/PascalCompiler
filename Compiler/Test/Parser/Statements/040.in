@@ -1,0 +1,7 @@
+program test;
+const
+  a: array[1..5] of integer = (1, 2, 3, 4, 5);
+  b: integer = a[2];
+begin
+  write(b);
+end.
