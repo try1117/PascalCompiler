@@ -95,7 +95,7 @@ std::string FunctionType::toString()
 	if (!body->children.empty()) {
 		//res += "\n" + indent + name + " statements:\n";
 		//increaseIndent(indent);
-		res += body->toString(indent);
+		res += body->toString(indent) + "\n";
 		//decreaseIndent(indent);
 	}
 	return res;

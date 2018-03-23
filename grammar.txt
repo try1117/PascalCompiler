@@ -185,6 +185,8 @@ hex_digit_sequence = hex_digit, { hex_digit };
 
 hex_digit = "A" | "a" | "B" | "b" | "C" | "c" | "D" | "d" | "E" | "e" | "F" | "f" | digit;
 
+bin_digit_sequence = ( "0" | "1" ), { "0" | "1" };
+
 variable_identifier = identifier;
 
 type_identifier = identifier;

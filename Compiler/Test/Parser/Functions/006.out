@@ -18,6 +18,7 @@ test declarations:
    |            |    |       |-- 1
    |            |    --- Write
    |            |            |-- 'qwerty'
+
 |-- Statements
 |            |-- Write
 |            |       |-- []
@@ -25,3 +26,4 @@ test declarations:
 |            |       |    |           |-- 2
 |            |       |    |           --- 3.000000
 |            |       |    --- 5
+

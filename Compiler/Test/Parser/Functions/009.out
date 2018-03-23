@@ -33,6 +33,7 @@ test declarations:
    |            |    |           --- b
    |            |    --- Write
    |            |            |-- 'qwerty'
+
    i : Integer
 
 |-- Statements
@@ -73,3 +74,4 @@ test declarations:
 |            |                 |       |    --- 3
 |            |                 |       --- height
 |            |                 --- 32.000000
+

@@ -80,6 +80,7 @@ private:
 	PSyntaxNode forStatement();
 	PSyntaxNode continueStatement();
 	PSyntaxNode breakStatement();
+	PSyntaxNode exitStatement();
 
 	void expressionList(std::vector<PSyntaxNode> &expressions);
 	PSyntaxNode readWriteStatement(bool read);

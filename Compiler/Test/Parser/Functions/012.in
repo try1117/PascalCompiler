@@ -1,0 +1,21 @@
+program test;
+
+function a(i: integer): integer;
+
+  procedure aa;
+  begin
+    ab;
+  end;
+
+  procedure ab;
+  begin
+    aa;
+  end;
+
+begin
+  aa;
+  ab;
+end;
+
+begin
+end.

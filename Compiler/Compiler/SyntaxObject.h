@@ -148,6 +148,10 @@ class BreakNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
 };
 
+class ExitNode : public SyntaxNode {
+	using SyntaxNode::SyntaxNode;
+};
+
 class ReadNode : public SyntaxNode {
 public:
 	ReadNode(PToken token, PType type, std::vector<PSyntaxNode> children)

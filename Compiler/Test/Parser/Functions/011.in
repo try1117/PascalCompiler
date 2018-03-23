@@ -1,0 +1,10 @@
+program test;
+
+function a(i: integer): integer;
+begin
+end;
+
+begin
+  a(1);
+  a(1, 2);
+end.

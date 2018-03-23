@@ -860,6 +860,8 @@ PSyntaxNode Parser::parseStatement()
 			return continueStatement();
 		case KEYWORD_BREAK:
 			return breakStatement();
+		case KEYWORD_EXIT:
+			return exitStatement();
 		case KEYWORD_READ:
 			return readWriteStatement(true);
 		case KEYWORD_WRITE:
@@ -1032,6 +1034,20 @@ PSyntaxNode Parser::breakStatement()
 	PToken token = currentToken();
 	goToNextToken();
 	return std::make_shared<BreakNode>(token, Type::getSimpleType(Type::NIL));
+}
+
+PSyntaxNode Parser::exitStatement()
+{
+	PToken token = currentToken();
+	std::vector<PSyntaxNode> children;
+	goToNextToken();
+	if (currentTokenType() == SEP_BRACKET_LEFT) {
+		PSyntaxNode expr = parseLogical();
+		PType returnType = tables.back()->symbolsMap.at("result")->type;
+		requireTypesCompatibility(returnType, expr->type);
+		children.push_back(cast(expr, returnType));
+	}
+	return std::make_shared<ExitNode>(token, Type::getSimpleType(Type::NIL), children);
 }
 
 void Parser::expressionList(std::vector<PSyntaxNode> &expressions)

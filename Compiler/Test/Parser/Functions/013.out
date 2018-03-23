@@ -1,0 +1,29 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : function(
+      i : Integer
+   ) resultType : Integer
+
+   a declarations:
+      aa : function()
+         resultType : Nil
+
+      aa declarations:
+      |-- Statements
+      |            |-- exit
+
+      ab : function()
+         resultType : Nil
+
+      ab declarations:
+      |-- Statements
+      |            |-- exit
+
+   |-- Statements
+   |            |-- Call aa
+   |            |-- exit
+   |            |      |-- 5
+   |            --- Call ab
+
