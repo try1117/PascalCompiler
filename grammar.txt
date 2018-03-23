@@ -42,13 +42,16 @@ type =
 
 simple_type =
     ordinal_type
-    | real_type;
+    | real_type
+    | string_type;
 
 ordinal_type =
     "Integer"
     | "Char";
 
 real_type = "Double";
+
+string_type = "String";
 
 structured_type =
     array_type
@@ -161,9 +164,9 @@ identifier_list = identifier, { ",", identifier };
 
 range = expression, "..", expression;
 
-constant = ( [ sign ], ( variable_identifier | unsigned_number ) );
+constant = ( [ sign ], ( variable_identifier | unsigned_number ) ) | char_constant;
 
-char_constant = "'", letter, ( "'" | "#" ), unsigned_integer;
+char_constant = ("'", letter, "'") | ("#", unsigned_integer);
 
 sign = "+" | "-";
 
@@ -177,7 +180,8 @@ scale_factor = ( "E" | "e" ), [ sign ], digit_sequence;
 
 unsigned_integer =
     digit_sequence
-    | "$", hex_digit_sequence;
+    | "$", hex_digit_sequence
+    | "%", bin_digit_sequence;
 
 digit_sequence = digit, { digit };
 
