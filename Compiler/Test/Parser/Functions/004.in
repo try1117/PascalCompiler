@@ -1,0 +1,9 @@
+program test;
+
+function func(a: integer; b: double): integer;
+begin
+end;
+
+begin
+  write(func(2, 3));
+end.

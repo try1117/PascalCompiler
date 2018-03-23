@@ -1,0 +1,28 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   func : function(
+      a : Integer
+      b : Double
+   ) resultType : Integer
+
+   func declarations:
+   |-- Statements
+   |            |-- If
+   |            |    |-- <
+   |            |    |   |-- a
+   |            |    |   --- b
+   |            |    |       |-- b
+   |            |    |-- Call func
+   |            |    |           |-- *
+   |            |    |           |   |-- 2
+   |            |    |           |   --- a
+   |            |    |           --- b
+   |            |    --- Write
+   |            |            |-- 'qwerty'
+|-- Statements
+|            |-- Write
+|            |       |-- Call func
+|            |       |           |-- 2
+|            |       |           --- 3.000000

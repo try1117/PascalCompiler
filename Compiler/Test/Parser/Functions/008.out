@@ -1,0 +1,57 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   card : Type Record
+      name : String
+      sex : Char
+      age : Integer
+      height : Double
+   end
+
+   func : function(
+      a : Integer
+      b : Double
+   ) resultType : Array [1, 10] of Record
+      name : String
+      sex : Char
+      age : Integer
+      height : Double
+   end
+
+   func declarations:
+   |-- Statements
+   |            |-- If
+   |            |    |-- <
+   |            |    |   |-- a
+   |            |    |   --- b
+   |            |    |       |-- b
+   |            |    |-- Call func
+   |            |    |           |-- *
+   |            |    |           |   |-- 2
+   |            |    |           |   --- a
+   |            |    |           --- b
+   |            |    --- Write
+   |            |            |-- 'qwerty'
+   i : Integer
+
+|-- Statements
+|            |-- For
+|            |     |-- i
+|            |     |-- 1
+|            |     |-- 10
+|            |     --- Write
+|            |             |-- .
+|            |             |   |-- []
+|            |             |   |    |-- Call func
+|            |             |   |    |           |-- i
+|            |             |   |    |           --- 17.220000
+|            |             |   |    --- 10
+|            |             |   --- name
+|            |             --- .
+|            |                 |-- []
+|            |                 |    |-- Call func
+|            |                 |    |           |-- 2
+|            |                 |    |           --- 3.000000
+|            |                 |    --- 3
+|            |                 --- height

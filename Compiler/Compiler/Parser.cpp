@@ -194,7 +194,7 @@ PSyntaxNode Parser::parseIdentifier(PToken token)
 		return fieldAccess(node, token);
 	}
 	else if (symbol->type->category == Type::FUNCTION) {
-		return parseFunctionCall();
+		return parseFunctionCall(node);
 	}
 	
 	return node;
@@ -846,7 +846,7 @@ PSyntaxNode Parser::parseStatement()
 			}
 			if (symbol->type->category == Type::FUNCTION) {
 				goToNextToken();
-				return parseFunctionCall();
+				return parseFunctionCall(std::make_shared<VarNode>(token, symbol->type));
 			}
 			return assignStatement();
 		}
@@ -1086,7 +1086,36 @@ PSyntaxNode Parser::readWriteStatement(bool read)
 	}
 }
 
-PSyntaxNode Parser::parseFunctionCall()
+PSyntaxNode Parser::parseFunctionCall(PSyntaxNode node)
 {
-	return PSyntaxNode();
+	auto functionType = std::static_pointer_cast<FunctionType>(node->type);
+	auto children = parameterList(functionType);
+	auto res = std::make_shared<FunctionCallNode>(node->token, functionType->returnType, children);
+	if (res->type->category == Type::ARRAY) {
+		return indexedVariable(res, res->token);
+	}
+	else if (res->type->category == Type::RECORD) {
+		return fieldAccess(res, res->token);
+	}
+	return res;
+}
+
+std::vector<PSyntaxNode> Parser::parameterList(std::shared_ptr<FunctionType> type)
+{
+	std::vector<PSyntaxNode> params;
+	if (currentTokenType() == SEP_BRACKET_LEFT) {
+		expressionList(params);
+	}
+
+	if (params.size() != type->parameters->symbolsArray.size()) {
+		throw LexicalException(currentToken()->row, currentToken()->col, "Wrong number of parameters specified for call to " + type->name);
+	}
+
+	std::vector<PSyntaxNode> res;
+	for (int i = 0; i < type->parameters->symbolsArray.size(); ++i) {
+		auto cur = type->parameters->symbolsArray[i];
+		requireTypesCompatibility(cur->type, params[i]->type);
+		res.push_back(cast(params[i], cur->type));
+	}
+	return res;
 }

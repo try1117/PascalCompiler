@@ -83,5 +83,6 @@ private:
 
 	void expressionList(std::vector<PSyntaxNode> &expressions);
 	PSyntaxNode readWriteStatement(bool read);
-	PSyntaxNode parseFunctionCall();
+	PSyntaxNode parseFunctionCall(PSyntaxNode node);
+	std::vector<PSyntaxNode> parameterList(std::shared_ptr<FunctionType> type);
 };

@@ -1,0 +1,11 @@
+program test;
+
+function func(a: integer; b: double): array[1..10] of integer;
+begin
+  if a < b then write(1)//func(2 * a, b)
+  else write('qwerty');
+end;
+
+begin
+  write(func(2, 3)[5]);
+end.

@@ -161,3 +161,10 @@ public:
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_WRITE, token->row, token->col, "Write"), type, children)
 	{}
 };
+
+class FunctionCallNode : public SyntaxNode {
+public:
+	FunctionCallNode(PToken token, PType type, std::vector<PSyntaxNode> children)
+		: SyntaxNode(std::make_shared<Token>(token->type, token->row, token->col, "Call " + token->text), type, children, VAR_NODE)
+	{}
+};

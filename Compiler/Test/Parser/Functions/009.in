@@ -1,0 +1,21 @@
+program test;
+
+type card = record
+  name: string;
+  sex: char;
+  age: integer;
+  height: double;
+end;
+
+function func(a: integer; b: double): array[1..10] of card;
+begin
+  if a < b then func(2 * a, b)
+  else write('qwerty');
+end;
+
+var i: integer;
+
+begin
+  for i := 1 to 10 do
+    write(func(i, 17.22)[10].name + func(i * 2, i / i)[1].sex, 17 * func(2, 3)[3].height + 1 shl 5);
+end.
