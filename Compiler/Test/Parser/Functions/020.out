@@ -1,0 +1,6 @@
+Lexical exception in position (6,12) - Incompatible types, expected "Record
+   name : String
+end" but found "Record
+   name : Integer
+   a : Integer
+end"

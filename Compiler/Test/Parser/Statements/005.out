@@ -1,1 +1,1 @@
-Lexical exception in position (6,18) - Incompatible types, expected Integer but found Double
+Lexical exception in position (6,18) - Incompatible types, expected "Integer" but found "Double"

@@ -1,0 +1,19 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : function(
+      i : Integer
+   ) resultType : Array [1, 3] of Record
+      name : String
+   end
+
+   a declarations:
+      tmp : Array [1, 3] of Record
+         nAmE : String
+      end
+
+   |-- Statements
+   |            |-- exit
+   |            |      |-- tmp
+

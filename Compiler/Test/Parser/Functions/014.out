@@ -1,1 +1,1 @@
-Lexical exception in position (12,12) - Incompatible types, expected Nil but found Integer
+Lexical exception in position (12,12) - Incompatible types, expected "Nil" but found "Integer"

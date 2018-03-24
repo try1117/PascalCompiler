@@ -1,0 +1,10 @@
+program test;
+
+function a(i: integer): array[1..3] of record name: string; end;
+var tmp: array[1..3] of record nAmE: string; end;
+begin
+  exit(tmp);
+end;
+
+begin
+end.

@@ -671,14 +671,49 @@ void Parser::requireTypesCompatibility(PType left, PType right)
 		{ Type::STRING, Type::CHAR },
 	};
 
+	auto compatibilityException = LexicalException(currentToken()->row, currentToken()->col,
+		"Incompatible types, expected \"" + left->toString() + "\" but found \"" + right->toString() + "\"");
+
+	if (left->category == Type::ARRAY && right->category == Type::ARRAY) {
+		auto leftArr = std::static_pointer_cast<ArrayType>(left);
+		auto rightArr = std::static_pointer_cast<ArrayType>(right);
+		
+		if (leftArr->left->value->toInteger() != rightArr->left->value->toInteger() ||
+			leftArr->right->value->toInteger() != rightArr->right->value->toInteger())
+		{
+			throw compatibilityException;
+		}
+		requireTypesCompatibility(leftArr->elementType, rightArr->elementType);
+		return;
+	}
+
+	if (left->category == Type::RECORD && right->category == Type::RECORD) {
+		auto leftRec = std::static_pointer_cast<RecordType>(left);
+		auto rightRec = std::static_pointer_cast<RecordType>(right);
+
+		auto leftFields = leftRec->fields->symbolsArray;
+		auto rightFields = rightRec->fields->symbolsArray;
+		
+		if (leftFields.size() != rightFields.size()) {
+			throw compatibilityException;
+		}
+
+		for (int i = 0; i < leftFields.size(); ++i) {
+			if (lowerString(leftFields[i]->token->text) != lowerString(leftFields[i]->token->text)) {
+				throw compatibilityException;
+			}
+			requireTypesCompatibility(leftFields[i]->type, rightFields[i]->type);
+		}
+		return;
+	}
+
 	bool res = (left->category == right->category);
 	for (auto it : pairs) {
 		res = std::max(res, left->category == it.first && right->category == it.second);
 	}
 
 	if (!res) {
-		throw LexicalException(currentToken()->row, currentToken()->col,
-			"Incompatible types, expected " + Type::categoryName[left->category] + " but found " + Type::categoryName[right->category]);
+		throw compatibilityException;
 	}
 }
 
