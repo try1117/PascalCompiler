@@ -297,9 +297,6 @@ PType Parser::getOperationType(PType left, PType right, PToken operation)
 
 PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
 {
-	if (instanceOfConstNode(node)) {
-		return castConstNode(node, to);
-	}
 	PType type = node->type;
 	if (type->category == Type::FUNCTION) {
 		type = std::static_pointer_cast<FunctionType>(node->type)->returnType;
@@ -308,7 +305,7 @@ PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
 	bool compatibilityTable[4][4] = {
 		/* --- INT, DBL, CHR, STR */
 		/* INT */{ 1, 1, 1, 0 },
-		/* DBL */{ 0, 1, 0, 0 },
+		/* DBL */{ 1, 1, 1, 0 },
 		/* CHR */{ 1, 1, 1, 1 },
 		/* STR */{ 0, 0, 1, 1 },
 	};
@@ -318,6 +315,9 @@ PSyntaxNode Parser::cast(PSyntaxNode node, PType to)
 	}
 
 	if (type->category != to->category) {
+		if (instanceOfConstNode(node)) {
+			return castConstNode(node, to);
+		}
 		return std::make_shared<CastNode>(node, to, to->toString());
 	}
 	return node;
@@ -331,10 +331,10 @@ PSyntaxNode Parser::castConstNode(PSyntaxNode node, PType to)
 			cur->value->setDouble((double)cur->value->toInteger());
 		}
 		else if (to->category == Type::Category::INTEGER) {
-			cur->value->setInteger(cur->value->toDouble());
+			cur->value->setInteger((int)cur->value->toDouble());
 		}
 		else if (to->category == Type::Category::CHAR) {
-			cur->value->setChar(cur->value->toInteger());
+			cur->value->setChar((int)cur->value->toDouble());
 		}
 
 		cur->type = Type::getSimpleType(to->category);

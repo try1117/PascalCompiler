@@ -1,0 +1,4 @@
+program test;
+begin
+  write(string(22));
+end.

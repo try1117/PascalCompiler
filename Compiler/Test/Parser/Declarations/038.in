@@ -1,0 +1,5 @@
+program test;
+begin
+  write(integer(3.1415));
+  write(char(52.4882));
+end.

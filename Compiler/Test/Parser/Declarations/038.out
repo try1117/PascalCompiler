@@ -1,0 +1,10 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+|-- Statements
+|            |-- Write
+|            |       |-- 3
+|            --- Write
+|                    |-- '4'
+
