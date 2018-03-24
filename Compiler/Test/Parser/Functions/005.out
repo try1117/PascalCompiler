@@ -11,9 +11,9 @@ test declarations:
    |-- Statements
    |            |-- If
    |            |    |-- <
-   |            |    |   |-- a
+   |            |    |   |-- Double
+   |            |    |   |        |-- a
    |            |    |   --- b
-   |            |    |       |-- b
    |            |    |-- Call func
    |            |    |           |-- *
    |            |    |           |   |-- 2

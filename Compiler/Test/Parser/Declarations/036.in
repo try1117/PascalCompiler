@@ -1,0 +1,12 @@
+program test;
+var
+  a, b: integer;
+  d: double;
+  c: char;
+  s: string;
+
+begin
+  write(integer(c));
+  write((integer('0') + integer('5') + integer(c)) div (a + b));
+  write(char(230 - 5 * 25 - 7 * a) + string(c));
+end.

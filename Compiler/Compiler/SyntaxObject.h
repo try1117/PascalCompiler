@@ -75,8 +75,9 @@ public:
 class CastNode : public SyntaxNode {
 public:
 	PType newType;
-	CastNode(PSyntaxNode node, PType newType)
-		: SyntaxNode(node->token, node->type, std::vector<PSyntaxNode>({ node })), newType(newType)
+	CastNode(PSyntaxNode node, PType newType, std::string typeName)
+		: SyntaxNode(std::make_shared<Token>(UNDEFINED, node->token->row, node->token->col, typeName),
+			newType, std::vector<PSyntaxNode>({ node })), newType(newType)
 	{}
 };
 

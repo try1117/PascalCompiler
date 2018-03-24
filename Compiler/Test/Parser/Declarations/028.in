@@ -1,0 +1,4 @@
+program abc;
+a:integer; 
+begin
+end.

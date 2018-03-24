@@ -1,0 +1,16 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+|-- Statements
+|            |-- Write
+|            |       |-- 'a'
+|            |-- Write
+|            |       |-- 97
+|            |-- Write
+|            |       |-- 97.000000
+|            --- Write
+|                    |-- 'a'
+|                    |-- 48
+|                    --- '0'
+

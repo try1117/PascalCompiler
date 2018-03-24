@@ -1,0 +1,6 @@
+program test;
+const
+  a : double = 1;
+  gt : integer = 'code' > 4;
+begin
+end.

@@ -1,0 +1,7 @@
+program abc;
+var
+  a: integer;
+const
+  a = 1;
+begin
+end.

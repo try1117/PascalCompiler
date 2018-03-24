@@ -37,6 +37,7 @@ private:
 	PSyntaxNode createOperationNode(PSyntaxNode left, PSyntaxNode right, PToken operation);
 	
 	PIdentifierValue evalOperation(PSyntaxNode left, PSyntaxNode right, PToken operation, PType operationType);
+	PSyntaxNode forceCast(PToken token);
 
 	void parseProgram();
 

@@ -11,9 +11,9 @@ test declarations:
    |-- Statements
    |            |-- If
    |            |    |-- <
-   |            |    |   |-- a
+   |            |    |   |-- Double
+   |            |    |   |        |-- a
    |            |    |   --- b
-   |            |    |       |-- b
    |            |    |-- Write
    |            |    |       |-- 1
    |            |    --- Write

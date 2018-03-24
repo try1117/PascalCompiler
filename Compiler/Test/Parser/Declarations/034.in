@@ -1,0 +1,5 @@
+program test;
+const arr: array[5..7] of integer = (1, 2, 3);
+const arrUntyped = (1, 2, 3);
+begin
+end.

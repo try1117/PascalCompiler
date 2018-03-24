@@ -73,8 +73,8 @@ test declarations:
       |            |                |-- []
       |            |                |    |-- Call func
       |            |                |    |           |-- i
-      |            |                |    |           --- i
-      |            |                |    |               |-- i
+      |            |                |    |           --- Double
+      |            |                |    |                    |-- i
       |            |                |    --- 2
       |            |                --- age
       |            --- :=
@@ -89,21 +89,21 @@ test declarations:
       |                     |   |    |           --- 1.000000
       |                     |   |    --- 1
       |                     |   --- height
-      |                     --- div
-      |                           |-- div
-      |                           |     |-- .
-      |                           |     |   |-- Call innerFunc
-      |                           |     |   |                |-- 'a'
-      |                           |     |   |                --- 'c'
-      |                           |     |   --- age
-      |                           |     --- Call innerInner
+      |                     --- Double
+      |                              |-- div
+      |                              |     |-- .
+      |                              |     |   |-- Call innerFunc
+      |                              |     |   |                |-- 'a'
+      |                              |     |   |                --- 'c'
+      |                              |     |   --- age
+      |                              |     --- Call innerInner
 
    |-- Statements
    |            |-- If
    |            |    |-- <
-   |            |    |   |-- a
+   |            |    |   |-- Double
+   |            |    |   |        |-- a
    |            |    |   --- b
-   |            |    |       |-- b
    |            |    |-- Call func
    |            |    |           |-- *
    |            |    |           |   |-- 2

@@ -1,0 +1,7 @@
+program test;
+begin
+  write('a');
+  write(integer('a'));
+  write(double('a'));
+  write(char('a'), 48, char(48));
+end.

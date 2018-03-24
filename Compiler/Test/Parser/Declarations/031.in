@@ -1,0 +1,7 @@
+program test;
+type
+  arr = integer;
+var
+  arr: array[1..10] of double;
+begin
+end.
