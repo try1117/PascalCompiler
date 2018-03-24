@@ -206,7 +206,6 @@ PSyntaxNode Parser::parseIdentifier(PToken token)
 
 PSyntaxNode Parser::constNodeAccess(PSyntaxNode node)
 {
-	//node->type->category != Type::NIL && Type::simpleCategories.count(node->type->category)) {
 	if (node->children.empty()) {
 		return getSymbol(node->token)->value;
 	}
@@ -221,17 +220,15 @@ PSyntaxNode Parser::constNodeAccess(PSyntaxNode node)
 	else if (node->token->type == SEP_DOT) {
 		auto recNode = constNodeAccess(node->children[0]);
 		auto recType = std::static_pointer_cast<RecordType>(recNode->type);
-		//auto tmp = std::static_pointer_cast<ConstNode>(node->children[1]);
 
-		std::string field = node->children[1]->token->text;//std::static_pointer_cast<ConstNode>(node->children[1])->value->toString();
+		std::string field = node->children[1]->token->text;
 		int idx;
 		for (idx = 0; idx < recType->fields->symbolsArray.size(); ++idx) {
 			if (recType->fields->symbolsArray[idx]->token->text == field)
 				break;
 		}
-		
+
 		return recNode->children[idx];
-		//return recType->fields->getSymbol(std::make_shared<Token>(UNDEFINED, 0, 0, field));
 	}
 	throw LexicalException(node->token->row, node->token->col, "Illegal expression");
 }
@@ -561,7 +558,6 @@ PType Parser::parseRecordType()
 	return std::make_shared<RecordType>(fields);
 }
 
-//std::shared_ptr<ConstNode>
 PSyntaxNode Parser::deepCopyNode(PSyntaxNode node)
 {
 	if (node->category == SyntaxNode::CONST_NODE) {
@@ -697,10 +693,6 @@ PSyntaxNode Parser::typedConstant(PType type)
 		else {
 			throw LexicalException(node->token->row, node->token->col, "Illegal expression");
 		}
-		//if (node->type->category != type->category) {
-		//	return std::make_shared<CastNode>(node, type);
-		//}
-		//return node;
 	}
 	else if (type->category == Type::ARRAY) {
 		auto arrayType = std::static_pointer_cast<ArrayType>(type);
@@ -928,7 +920,6 @@ PSyntaxNode Parser::assignStatement()
 		throw LexicalException(token->row, token->col, "Variable identifier expected");
 	}
 	PSyntaxNode node = parseIdentifier();
-	//goToNextToken();
 
 	requireThenNext({ KEYWORD_ASSIGN });
 	PSyntaxNode expr = parseLogical();

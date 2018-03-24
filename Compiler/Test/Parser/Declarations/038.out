@@ -5,6 +5,10 @@ test declarations:
 |-- Statements
 |            |-- Write
 |            |       |-- 3
+|            |-- Write
+|            |       |-- '4'
+|            |-- Write
+|            |       |-- 4096
 |            --- Write
-|                    |-- '4'
+|                    |-- 4096.000000
 

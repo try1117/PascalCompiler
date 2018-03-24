@@ -6,7 +6,6 @@
 #include <set>
 
 #include "Token.h"
-//#include "Types.h" // ALERT circular dependencies, need to move FunctionType to another module?
 
 class SyntaxNode;
 typedef std::shared_ptr<SyntaxNode> PSyntaxNode;

@@ -1,0 +1,22 @@
+program test;
+
+function a(i: integer): integer;
+
+  procedure aa;
+  begin
+    exit;
+  end;
+
+  procedure ab;
+  begin
+    exit;
+  end;
+
+begin
+  aa;
+  exit(5.0);
+  ab;
+end;
+
+begin
+end.
