@@ -80,7 +80,13 @@ public:
 
 	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset, AsmRegister::RegisterType reg);
 	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2);
+	
+	AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1, AsmMemory::DataSize dataSize2, AsmRegister::RegisterType reg2, int offset2);
+	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize1, AsmRegister::RegisterType reg1, int offset1, AsmRegister::RegisterType reg2);
 
+	//code.push_back({ AsmCommand::cmp, AsmMemory::DataSize::dword, AsmRegister::ebp, counterOffset, AsmRegister::esp });
+
+	//code.push_back({ AsmCommand::pop, AsmMemory::DataSize::dword, -counterOffset, AsmRegister::ebp });
 
 	//AsmCommand::cmp, AsmMemory::DataSize::dword, AsmRegister::esp, AsmRegister::ebx
 

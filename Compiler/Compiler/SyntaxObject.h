@@ -151,6 +151,8 @@ public:
 	{
 		if (body != nullptr) children.push_back(body);
 	}
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 class ContinueNode : public SyntaxNode {

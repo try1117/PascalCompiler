@@ -94,8 +94,8 @@ AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, in
 AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset, AsmRegister::RegisterType reg)
 	: commandType(commandType)
 {
-	push_back(std::make_shared<AsmMemory>(dataSize, offset));
-	push_back(std::make_shared<AsmRegister>(reg));
+	//push_back(std::make_shared<AsmMemory>(dataSize, offset));
+	push_back(std::make_shared<AsmRegister>(reg, dataSize, offset));
 }
 
 AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2)
@@ -103,6 +103,20 @@ AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, As
 {
 	//push_back(std::make_shared<AsmMemory>(dataSize, ))
 	push_back(std::make_shared<AsmRegister>(reg1, dataSize, 0));
+	push_back(std::make_shared<AsmRegister>(reg2));
+}
+
+AsmCommand::AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1, AsmMemory::DataSize dataSize2, AsmRegister::RegisterType reg2, int offset2)
+	: commandType(commandType)
+{
+	push_back(std::make_shared<AsmRegister>(reg1));
+	push_back(std::make_shared<AsmRegister>(reg2, dataSize2, offset2));
+}
+
+AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize1, AsmRegister::RegisterType reg1, int offset1, AsmRegister::RegisterType reg2)
+	: commandType(commandType)
+{
+	push_back(std::make_shared<AsmRegister>(reg1, dataSize1, offset1));
 	push_back(std::make_shared<AsmRegister>(reg2));
 }
 

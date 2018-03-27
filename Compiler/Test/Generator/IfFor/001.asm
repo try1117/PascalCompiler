@@ -90,6 +90,25 @@ push -1
 pop eax
 printf("%d\n", eax)
 $IFEND7@:
+push 2
+pop dword ptr [ebp - 4]
+push dword ptr [ebp - 4]
+push 2
+pop ebx
+cmp dword ptr [esp - 0], ebx
+setne al
+sub al, 1
+movsx eax, al
+mov dword ptr [esp - 0], eax
+pop eax
+test eax, eax
+jz $IFFAIL8@
+push 123123123
+pop eax
+printf("%d\n", eax)
+jmp $IFEND9@
+$IFFAIL8@:
+$IFEND9@:
 mov esp, ebp
 pop ebp
 exit

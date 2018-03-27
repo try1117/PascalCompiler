@@ -16,4 +16,7 @@ begin
 
   if (a > b) then write(1)
   else write(-1);
+
+  a := 2;
+  if a = 2 then write(123123123);
 end.

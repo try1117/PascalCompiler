@@ -1,0 +1,15 @@
+program test;
+var a, b: integer;
+begin
+  for a := 1 to 10 do begin
+    write(a);
+  end;
+  
+  write(11111111);
+
+  for a := 1 to 4 do begin
+    for b := 1 to a do begin
+      write(a * b);
+    end;
+  end;
+end.

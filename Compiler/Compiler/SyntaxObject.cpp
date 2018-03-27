@@ -197,3 +197,37 @@ void WhileNode::toAsmCode(AsmCode &code)
 	code.push_back({ AsmCommand::jnz, bodyLabel });
 	code.push_back({ AsmCommand::label, endLabel });
 }
+
+void ForNode::toAsmCode(AsmCode &code)
+{
+	std::string condLabel = code.getLabel("FOR_COND");
+	std::string bodyLabel = code.getLabel("FOR_BODY");
+	std::string endLabel = code.getLabel("FOR_END");
+
+	to->toAsmCode(code);
+	from->toAsmCode(code);
+
+	int counterOffset = code.offsets[lowerString(counter->token->text)];
+
+	// assign from value
+	code.push_back({ AsmCommand::pop, AsmMemory::DataSize::dword, counterOffset, AsmRegister::ebp });
+
+	// decrease and jump to condition
+	code.push_back({ (downTo ? AsmCommand::inc : AsmCommand::dec), AsmMemory::DataSize::dword, counterOffset, AsmRegister::ebp });
+	code.push_back({ AsmCommand::jmp, condLabel });
+	
+	code.push_back({ AsmCommand::label, bodyLabel });
+	body->toAsmCode(code);
+
+	// decrease/increase
+	code.push_back({ AsmCommand::label, condLabel });
+	code.push_back({ (downTo ? AsmCommand::dec : AsmCommand::inc), AsmMemory::DataSize::dword, counterOffset, AsmRegister::ebp });
+
+	// put 'from' to eax
+	code.push_back({ AsmCommand::mov, AsmRegister::eax, AsmMemory::DataSize::dword, AsmRegister::esp, 0 });
+	code.push_back({ AsmCommand::cmp, AsmMemory::DataSize::dword, AsmRegister::ebp, counterOffset, AsmRegister::eax });
+	code.push_back({ (downTo ? AsmCommand::jge : AsmCommand::jle), bodyLabel });
+
+	code.push_back({ AsmCommand::label, endLabel });
+	code.push_back({ AsmCommand::add, AsmRegister::esp, "4" });
+}

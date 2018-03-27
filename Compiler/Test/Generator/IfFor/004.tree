@@ -1,0 +1,33 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   b : Integer
+
+|-- Statements
+|            |-- For
+|            |     |-- a
+|            |     |-- 1
+|            |     |-- 10
+|            |     --- Statements
+|            |                  |-- Write
+|            |                  |       |-- a
+|            |-- Write
+|            |       |-- 11111111
+|            --- For
+|                  |-- a
+|                  |-- 1
+|                  |-- 4
+|                  --- Statements
+|                               |-- For
+|                               |     |-- b
+|                               |     |-- 1
+|                               |     |-- a
+|                               |     --- Statements
+|                               |                  |-- Write
+|                               |                  |       |-- *
+|                               |                  |       |   |-- a
+|                               |                  |       |   --- b
+
