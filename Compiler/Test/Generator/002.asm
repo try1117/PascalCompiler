@@ -9,6 +9,11 @@ sub esp, 4
 push 123
 pop dword ptr [ebp - 4]
 push dword ptr [ebp - 4]
+push 10001
+pop ebx
+pop eax
+add eax, ebx
+push eax
 pop eax
 printf("%d\n", eax)
 mov esp, ebp

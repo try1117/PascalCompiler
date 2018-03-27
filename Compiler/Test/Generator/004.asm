@@ -6,9 +6,14 @@ start:
 push ebp
 mov ebp, esp
 sub esp, 4
-push 123
+push 128
 pop dword ptr [ebp - 4]
 push dword ptr [ebp - 4]
+push 128
+pop ebx
+pop eax
+imul eax, ebx
+push eax
 pop eax
 printf("%d\n", eax)
 mov esp, ebp

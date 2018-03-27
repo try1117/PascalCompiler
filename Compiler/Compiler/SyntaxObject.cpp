@@ -50,41 +50,78 @@ void SyntaxNode::toAsmCode(AsmCode & code)
 
 void WriteNode::toAsmCode(AsmCode &code)
 {
-	int offset = 0;
-	std::string res = "\"";
-	std::vector<std::shared_ptr<AsmParameter>> parameters;
-
-	for (auto child : children) {
-		auto category = child->type->category;
-		AsmMemory::DataSize size;
-
-		if (category == Type::Category::CHAR) {
-			res += "%c";
-			size = AsmMemory::DataSize::byte;
-		}
-		else if (category == Type::Category::INTEGER) {
-			res += "%d";
-			size = AsmMemory::DataSize::dword;
-		}
-		else if (category == Type::Category::DOUBLE) {
-			res += "%f";
-			size = AsmMemory::DataSize::qword;
-		}
-
-		child->toAsmCode(code);
-		parameters.push_back(std::make_shared<AsmRegister>(AsmRegister::RegisterType::eax, size, offset));
-		offset += child->type->size;
+	if (children.size() != 1) {
+		throw std::exception("Write can't contain more than one argument");
 	}
-	res += "\\n\"";
+	
+	std::string res = "\"";
+	auto child = children[0];
+	AsmMemory::DataSize size;
 
-	code.push_back({ AsmCommand::CommandType::mov, AsmRegister::RegisterType::eax, AsmRegister::RegisterType::esp });
-	parameters.push_back(std::make_shared<AsmValue>(res));
-	reverse(parameters.begin(), parameters.end());
-	code.push_back({ AsmCommand::CommandType::printf, parameters });
-	code.push_back({ AsmCommand::CommandType::add, AsmRegister::RegisterType::esp, std::to_string(offset) });
+	if (child->type->category == Type::Category::CHAR) {
+		res += "%c";
+		size = AsmMemory::DataSize::byte;
+	}
+	else if (child->type->category == Type::Category::INTEGER) {
+		res += "%d";
+		size = AsmMemory::DataSize::dword;
+	}
+
+	res += "\\n\"";
+	child->toAsmCode(code);
+	code.push_back({ AsmCommand::CommandType::pop, AsmRegister::eax });
+
+	code.push_back({ AsmCommand::CommandType::printf });
+	code.commands.back().push_back(std::make_shared<AsmValue>(res));
+	code.commands.back().push_back(std::make_shared<AsmRegister>(AsmRegister::eax));
 }
 
 void ConstNode::toAsmCode(AsmCode & code)
 {
 	code.push_back({ AsmCommand::CommandType::push, value->toString() });
+}
+
+void VarNode::toAsmCode(AsmCode & code)
+{
+	code.push_back({ AsmCommand::CommandType::push, AsmMemory::DataSize::dword, code.offsets[lowerString(token->text)] });
+}
+
+void BinaryOpNode::toAsmCode(AsmCode &code)
+{
+	std::map<TokenType, AsmCommand::CommandType> comTypes = {
+		{ OP_PLUS, AsmCommand::add },
+		{ OP_MINUS, AsmCommand::sub },
+		{ OP_MULT, AsmCommand::imul },
+		{ KEYWORD_DIV, AsmCommand::idiv },
+	};
+
+	AsmCommand::CommandType comType = comTypes[token->type];
+	auto left = children[0];
+	auto right = children[1];
+	auto reg1 = AsmRegister::eax;
+	auto reg2 = AsmRegister::ebx;
+
+	left->toAsmCode(code);
+	right->toAsmCode(code);
+
+	code.push_back({ AsmCommand::pop, reg2 });
+	code.push_back({ AsmCommand::pop, reg1 });
+
+	if (token->type == KEYWORD_DIV) {
+		code.push_back({ AsmCommand::cdq });
+		code.push_back({ comType, reg2 });
+	}
+	else {
+		code.push_back({ comType, reg1, reg2 });
+	}
+	code.push_back({ AsmCommand::push, reg1 });
+}
+
+void AssignStatement::toAsmCode(AsmCode &code)
+{
+	auto left = children[0];
+	auto right = children[1];
+
+	right->toAsmCode(code);
+	code.push_back({ AsmCommand::pop, AsmMemory::dword, code.offsets[lowerString(left->token->text)] });
 }

@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 
 class AsmParameter {
 public:
@@ -17,7 +18,7 @@ public:
 	DataSize dataSize;
 	int offset;
 
-	AsmMemory(DataSize dataType, int offset) :
+	AsmMemory(DataSize dataSize, int offset) :
 		dataSize(dataSize), offset(offset)
 	{}
 
@@ -60,16 +61,19 @@ public:
 class AsmCommand {
 public:
 	enum CommandType {
-		mov, push, pop, add, sub, mul, div, printf, movsd, and, or , xor, mulsd, addsd, divsd, subsd,
+		mov, push, pop, add, sub, imul, idiv, cdq, printf, movsd, and, or , xor, mulsd, addsd, divsd, subsd,
 	};
 
 	CommandType commandType;
 	std::vector<std::shared_ptr<AsmParameter>> parameters;
 
+	AsmCommand(CommandType commandType);
+	AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1);
 	AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2);
-	AsmCommand(CommandType commandType, std::vector<std::shared_ptr<AsmParameter>> &p);
 	AsmCommand(CommandType commandType, AsmRegister::RegisterType reg, std::string value);
 	AsmCommand(CommandType commandType, std::string value);
+	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset);
+	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset, AsmRegister::RegisterType reg);
 
 	void push_back(std::shared_ptr<AsmParameter> par1, std::shared_ptr<AsmParameter> par2);
 	void push_back(std::shared_ptr<AsmParameter> par);
@@ -78,13 +82,18 @@ public:
 	static const std::string commandName[];
 };
 
+class Symbol;
+typedef std::shared_ptr<Symbol> PSymbol;
+
 class AsmCode {
 public:
 	AsmCode() {}
 
 	int size = 0;
 	std::vector<AsmCommand> commands;
+	std::map<std::string, int> offsets;
 
+	void addSymbol(PSymbol symbol);
 	void push_back(AsmCommand&& command);
 	std::string toString();
 };

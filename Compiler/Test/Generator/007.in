@@ -1,0 +1,8 @@
+program test;
+var a, b: integer;
+begin
+  a := 100;
+  b := 4;
+  a := 5 * a - 1 + b * b * b div 2;
+  write(a);
+end.

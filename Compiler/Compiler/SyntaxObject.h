@@ -38,6 +38,7 @@ public:
 	VarNode(PToken token, PType type, std::vector<PSyntaxNode> children = {}, Category category = VAR_NODE)
 		: SyntaxNode(token, type, children, category)
 	{}
+	void toAsmCode(AsmCode &code) override;
 };
 
 class UnaryMinusNode : public SyntaxNode {
@@ -46,6 +47,8 @@ class UnaryMinusNode : public SyntaxNode {
 
 class BinaryOpNode : public SyntaxNode {
 	using SyntaxNode::SyntaxNode;
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 class NotNode : public SyntaxNode {
@@ -105,6 +108,8 @@ public:
 	AssignStatement(PType type, std::vector<PSyntaxNode> children)
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_ASSIGN, 0, 0, ":="), type, children)
 	{}
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 class IfStatement : public SyntaxNode {

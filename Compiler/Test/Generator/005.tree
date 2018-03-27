@@ -7,7 +7,9 @@ test declarations:
 |-- Statements
 |            |-- :=
 |            |    |-- a
-|            |    --- 123
+|            |    --- 100
 |            --- Write
-|                    |-- a
+|                    |-- div
+|                    |     |-- a
+|                    |     --- 25
 

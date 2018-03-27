@@ -1,4 +1,7 @@
 #include "Generator.h"
+#include "SymbolTable.h"
+#include "Types.h"
+#include "Utils.h"
 
 const std::string AsmMemory::dataSizeName[] = {
 	"byte", "word", "dword", "qword",
@@ -9,7 +12,7 @@ const std::string AsmRegister::registerName[] = {
 };
 
 const std::string AsmCommand::commandName[] = {
-	"mov", "push", "pop", "add", "sub", "mul", "div", "printf", "movsd",
+	"mov", "push", "pop", "add", "sub", "imul", "idiv", "cdq", "printf", "movsd",
 	"and", "or", "xor", "mulsd", "addsd", "divsd", "subsd",
 };
 
@@ -27,6 +30,12 @@ std::string AsmRegister::toString()
 	return registerName[registerType];
 }
 
+void AsmCode::addSymbol(PSymbol symbol)
+{
+	size += symbol->type->size;
+	offsets[lowerString(symbol->token->text)] = size;
+}
+
 void AsmCode::push_back(AsmCommand && command)
 {
 	commands.push_back(command);
@@ -35,8 +44,6 @@ void AsmCode::push_back(AsmCommand && command)
 std::string AsmCode::toString()
 {
 	std::string result = "include c:\\masm32\\include\\masm32rt.inc\n.xmm\n.const\n";
-	//for (const auto& it : double_const_)
-	//	result += str(boost::format("__real\@%1% dq %1%r\n") % it.second);
 	result += ".code\nstart:\n";
 	result += "push ebp\nmov ebp, esp\nsub esp, " + std::to_string(size) + "\n";
 	for (auto &command : commands)
@@ -45,17 +52,16 @@ std::string AsmCode::toString()
 	return result + "exit\nend start\n";
 }
 
+AsmCommand::AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1)
+	: commandType(commandType)
+{
+	push_back(std::make_shared<AsmRegister>(reg1));
+}
+
 AsmCommand::AsmCommand(CommandType commandType, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2)
 	: commandType(commandType)
 {
 	push_back(std::make_shared<AsmRegister>(reg1), std::make_shared<AsmRegister>(reg2));
-}
-
-AsmCommand::AsmCommand(CommandType commandType, std::vector<std::shared_ptr<AsmParameter>>& p)
-	: commandType(commandType)
-{
-	for (auto it : p)
-		push_back(it);
 }
 
 AsmCommand::AsmCommand(CommandType commandType, AsmRegister::RegisterType reg, std::string value)
@@ -68,6 +74,24 @@ AsmCommand::AsmCommand(CommandType commandType, std::string value)
 	: commandType(commandType)
 {
 	push_back(std::make_shared<AsmValue>(value));
+}
+
+AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset)
+	: commandType(commandType)
+{
+	push_back(std::make_shared<AsmMemory>(dataSize, offset));
+}
+
+AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset, AsmRegister::RegisterType reg)
+	: commandType(commandType)
+{
+	push_back(std::make_shared<AsmMemory>(dataSize, offset));
+	push_back(std::make_shared<AsmRegister>(reg));
+}
+
+AsmCommand::AsmCommand(CommandType commandType)
+	: commandType(commandType)
+{
 }
 
 void AsmCommand::push_back(std::shared_ptr<AsmParameter> par)

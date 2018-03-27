@@ -2,5 +2,5 @@ program test;
 var a: integer;
 begin
   a := 123;
-  write(a);
+  write(a + 10001);
 end.

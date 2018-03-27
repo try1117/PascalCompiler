@@ -1,6 +1,6 @@
 program test;
 var a: integer;
 begin
-  a := 123;
-  write(a);
+  a := 128;
+  write(a * 128);
 end.
