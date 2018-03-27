@@ -1,0 +1,17 @@
+// output 1 1 0
+program test;
+var a, b: integer;
+begin
+  a := 123;
+  b := 123;
+  
+  if (a >= b) then write(1)
+  else write(0);
+
+  if (a <= 123) then write(1)
+  else write(0);
+
+  b := 124;
+  if (b <= a) then write(1)
+  else write(0);
+end.

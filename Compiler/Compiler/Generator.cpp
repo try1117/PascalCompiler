@@ -8,12 +8,16 @@ const std::string AsmMemory::dataSizeName[] = {
 };
 
 const std::string AsmRegister::registerName[] = {
-	"eax", "ebx", "ecx", "edx", "xmm0", "xmm1", "esp", "ebp",
+	"eax", "ebx", "ecx", "edx", "xmm0", "xmm1", "esp", "ebp", "al", "cl", "ah", "bl", "ax",
 };
 
 const std::string AsmCommand::commandName[] = {
 	"mov", "push", "pop", "add", "sub", "imul", "idiv", "cdq", "printf", "movsd",
 	"and", "or", "xor", "mulsd", "addsd", "divsd", "subsd",
+	"setge", "setg", "setle", "setl", "sete", "setne", "cmp", "jmp", "",
+	"comisd", "ucomisd", "setbe", "setb", "seta", "setae", "jp", "jnp", "lahf", "test",
+	"loop", "jnz", "jz", "inc", "dec", "jge", "jle",
+	"movsx",
 };
 
 std::string AsmMemory::toString()
@@ -28,6 +32,11 @@ std::string AsmRegister::toString()
 			+ " - " + std::to_string(offset) + "]";
 	}
 	return registerName[registerType];
+}
+
+std::string AsmCode::getLabel(std::string name)
+{
+	return "$" + name + std::to_string(labelCnt++) + "@";
 }
 
 void AsmCode::addSymbol(PSymbol symbol)
@@ -89,6 +98,14 @@ AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, in
 	push_back(std::make_shared<AsmRegister>(reg));
 }
 
+AsmCommand::AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2)
+	: commandType(commandType)
+{
+	//push_back(std::make_shared<AsmMemory>(dataSize, ))
+	push_back(std::make_shared<AsmRegister>(reg1, dataSize, 0));
+	push_back(std::make_shared<AsmRegister>(reg2));
+}
+
 AsmCommand::AsmCommand(CommandType commandType)
 	: commandType(commandType)
 {
@@ -107,6 +124,9 @@ void AsmCommand::push_back(std::shared_ptr<AsmParameter> par1, std::shared_ptr<A
 
 std::string AsmCommand::toString()
 {
+	if (commandType == label) {
+		return parameters[0]->toString() + ":";
+	}
 	std::string res = commandName[commandType] + (commandType == CommandType::printf ? "(" : " ");
 	for (auto i = 0; i < parameters.size(); ++i) {
 		res += parameters[i]->toString() + (i + 1 != parameters.size() ? ", " : "");

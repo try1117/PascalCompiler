@@ -1,0 +1,43 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+   a : Integer
+
+   b : Integer
+
+|-- Statements
+|            |-- :=
+|            |    |-- a
+|            |    --- 123
+|            |-- :=
+|            |    |-- b
+|            |    --- 123
+|            |-- If
+|            |    |-- >=
+|            |    |    |-- a
+|            |    |    --- b
+|            |    |-- Write
+|            |    |       |-- 1
+|            |    --- Write
+|            |            |-- 0
+|            |-- If
+|            |    |-- <=
+|            |    |    |-- a
+|            |    |    --- 123
+|            |    |-- Write
+|            |    |       |-- 1
+|            |    --- Write
+|            |            |-- 0
+|            |-- :=
+|            |    |-- b
+|            |    --- 124
+|            --- If
+|                 |-- <=
+|                 |    |-- b
+|                 |    --- a
+|                 |-- Write
+|                 |       |-- 1
+|                 --- Write
+|                         |-- 0
+

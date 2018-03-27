@@ -123,6 +123,8 @@ public:
 		if (ifPart != nullptr) children.push_back(ifPart);
 		if (elsePart != nullptr) children.push_back(elsePart);
 	}
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 class WhileNode : public SyntaxNode {
@@ -134,6 +136,8 @@ public:
 	{
 		if (body != nullptr) children.push_back(body);
 	}
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 class ForNode : public SyntaxNode {

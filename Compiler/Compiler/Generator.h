@@ -29,7 +29,7 @@ public:
 class AsmRegister : public AsmParameter {
 public:
 	enum RegisterType {
-		eax, ebx, ecx, edx, xmm0, xmm1, esp, ebp,
+		eax, ebx, ecx, edx, xmm0, xmm1, esp, ebp, al, cl, ah, bl, ax,
 	};
 
 	RegisterType registerType;
@@ -62,6 +62,10 @@ class AsmCommand {
 public:
 	enum CommandType {
 		mov, push, pop, add, sub, imul, idiv, cdq, printf, movsd, and, or , xor, mulsd, addsd, divsd, subsd,
+		setge, setg, setle, setl, sete, setne, cmp, jmp, label,
+		comisd, ucomisd, setbe, setb, seta, setae, jp, jnp, lahf, test,
+		loop, jnz, jz, inc, dec, jge, jle,
+		movsx,
 	};
 
 	CommandType commandType;
@@ -73,7 +77,12 @@ public:
 	AsmCommand(CommandType commandType, AsmRegister::RegisterType reg, std::string value);
 	AsmCommand(CommandType commandType, std::string value);
 	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset);
+
 	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, int offset, AsmRegister::RegisterType reg);
+	AsmCommand(CommandType commandType, AsmMemory::DataSize dataSize, AsmRegister::RegisterType reg1, AsmRegister::RegisterType reg2);
+
+
+	//AsmCommand::cmp, AsmMemory::DataSize::dword, AsmRegister::esp, AsmRegister::ebx
 
 	void push_back(std::shared_ptr<AsmParameter> par1, std::shared_ptr<AsmParameter> par2);
 	void push_back(std::shared_ptr<AsmParameter> par);
@@ -93,7 +102,11 @@ public:
 	std::vector<AsmCommand> commands;
 	std::map<std::string, int> offsets;
 
+	std::string getLabel(std::string name);
 	void addSymbol(PSymbol symbol);
 	void push_back(AsmCommand&& command);
 	std::string toString();
+
+private:
+	int labelCnt = 0;
 };

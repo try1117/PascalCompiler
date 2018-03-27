@@ -1,0 +1,11 @@
+program test;
+var a, b: integer;
+begin
+  a := 0;
+  b := 10;
+  while (a < b) do
+  begin
+    write(a + 1);
+    a := a + 1;
+  end;
+end.
