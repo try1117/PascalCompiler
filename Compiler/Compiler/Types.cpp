@@ -25,11 +25,11 @@ std::string FunctionType::indent = "";
 PType Type::getSimpleType(Type::Category category)
 {
 	static const std::map<Category, PType> types = {
-		{ INTEGER, std::make_shared<Type>(INTEGER) },
-		{ DOUBLE, std::make_shared<Type>(DOUBLE) },
-		{ CHAR, std::make_shared<Type>(CHAR) },
-		{ STRING, std::make_shared<Type>(STRING) },
-		{ NIL, std::make_shared<Type>(NIL) },
+		{ INTEGER, std::make_shared<Type>(INTEGER, 4) },
+		{ DOUBLE, std::make_shared<Type>(DOUBLE, 8) },
+		{ CHAR, std::make_shared<Type>(CHAR, 1) },
+		{ STRING, std::make_shared<Type>(STRING, 0) },
+		{ NIL, std::make_shared<Type>(NIL, 0) },
 	};
 	return types.at(category);
 	//return types[category];

@@ -6,6 +6,7 @@
 #include <set>
 
 #include "Token.h"
+#include "Generator.h"
 
 class SyntaxNode;
 typedef std::shared_ptr<SyntaxNode> PSyntaxNode;
@@ -29,6 +30,7 @@ public:
 	SyntaxNode(PToken token, PType type, std::vector<PSyntaxNode> children = {}, Category category = NIL);
 	void print(std::string &output, std::string prefix = "", bool end = true);
 	std::string toString(std::string prefix = "");
+	virtual void toAsmCode(AsmCode &code);
 };
 
 class VarNode : public SyntaxNode {
@@ -59,6 +61,8 @@ public:
 		if (value != nullptr)
 			token->text = value->toString();
 	}
+
+	void toAsmCode(AsmCode &code) override;
 };
 
 typedef std::shared_ptr<ConstNode> PConstNode;
@@ -164,6 +168,7 @@ public:
 	WriteNode(PToken token, PType type, std::vector<PSyntaxNode> children)
 		: SyntaxNode(std::make_shared<Token>(KEYWORD_WRITE, token->row, token->col, "Write"), type, children)
 	{}
+	void toAsmCode(AsmCode &code) override;
 };
 
 class FunctionCallNode : public SyntaxNode {

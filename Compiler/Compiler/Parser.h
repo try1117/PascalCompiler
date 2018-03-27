@@ -4,16 +4,19 @@
 #include "Types.h"
 #include "SymbolTable.h"
 #include "Operation.h"
+#include "Generator.h"
 
 class Parser {
 public:
 	Parser(std::shared_ptr<Tokenizer> tokenizer);
 	PType parse();
+	void toAsmCode(AsmCode &code);
 
 private:
 	std::shared_ptr<Tokenizer> tokenizer;
 	std::string programName;
 	std::vector<PSymbolTable> tables;
+	std::shared_ptr<FunctionType> mainProgram;
 	int loopCnt = 0;
 
 	void goToNextToken();

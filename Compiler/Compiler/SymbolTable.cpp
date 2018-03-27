@@ -61,6 +61,10 @@ PSymbol SymbolTable::getSymbol(PToken token)
 	return nullptr;
 }
 
+void SymbolTable::toAsmCode(AsmCode & code)
+{
+}
+
 void SymbolTable::addSymbol(PSymbol symbol)
 {
 	symbolsArray.push_back(symbol);

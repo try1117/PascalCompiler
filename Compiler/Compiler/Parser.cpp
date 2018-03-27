@@ -4,7 +4,7 @@
 #include "Exceptions.h"
 
 Parser::Parser(std::shared_ptr<Tokenizer> tokenizer)
-	: tokenizer(tokenizer)
+	: tokenizer(tokenizer), mainProgram(nullptr)
 {
 }
 
@@ -418,15 +418,25 @@ PSyntaxNode Parser::forceCast(PToken token)
 	PSyntaxNode expr = parseLogical();
 	requireThenNext({ SEP_BRACKET_RIGHT });
 
-	auto tmp = cast(expr, forceType);
-	return tmp;
+	//auto tmp = cast(expr, forceType);
+	//return tmp;
 	return cast(expr, forceType);
 }
 
 PType Parser::parse()
 {
-	parseProgram();
-	return functionDeclarationPart(MAIN_PROGRAM);
+	if (mainProgram == nullptr) {
+		parseProgram();
+		return mainProgram = functionDeclarationPart(MAIN_PROGRAM);
+	}
+	return mainProgram;
+}
+
+void Parser::toAsmCode(AsmCode &code)
+{
+	if (mainProgram == nullptr) parse();
+	mainProgram->declarations->toAsmCode(code);
+	mainProgram->body->toAsmCode(code);
 }
 
 void Parser::parseProgram()

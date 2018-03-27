@@ -50,6 +50,8 @@ public:
 
 	PSymbol getSymbol(PToken token);
 
+	void toAsmCode(AsmCode &code);
+
 private:
 	void addSymbol(PSymbol symbol);
 };

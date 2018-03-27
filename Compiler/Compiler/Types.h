@@ -27,8 +27,10 @@ public:
 	static const std::set<Category> simpleCategories;
 
 	Category category;
-	Type(Category category = Category::NIL)
-		: category(category)
+	int size;
+
+	Type(Category category = Category::NIL, int size = 0)
+		: category(category), size(size)
 	{}
 
 	static std::string indent;

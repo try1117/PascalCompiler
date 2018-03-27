@@ -6,6 +6,7 @@
 #include "ExpressionParser.h"
 #include "Parser.h"
 #include "Exceptions.h"
+#include "Generator.h"
 
 int main(int argc, char *argv[])
 {
@@ -71,6 +72,28 @@ int main(int argc, char *argv[])
 			}
 			catch (std::exception e) {
 				output << e.what() << std::endl;
+			}
+		}
+		else if (strcmp(argv[1], "-g") == 0) {
+			Parser parser(std::shared_ptr<Tokenizer>(new Tokenizer(argv[2])));
+			std::ofstream syntaxTree("syntax_tree.txt");
+			std::ofstream asmCode("asm_code.txt");
+
+			try {
+				PType mainFunction = parser.parse();
+				syntaxTree << mainFunction->toString();
+				AsmCode code;
+				parser.toAsmCode(code);
+				asmCode << code.toString();
+			}
+			catch (LexicalException e) {
+				syntaxTree << e.what() << std::endl;
+			}
+			catch (SyntaxException e) {
+				syntaxTree << e.what() << std::endl;
+			}
+			catch (std::exception e) {
+				syntaxTree << e.what() << std::endl;
 			}
 		}
 	}

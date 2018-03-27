@@ -114,6 +114,7 @@
   <ItemGroup>
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="ExpressionParser.cpp" />
+    <ClCompile Include="Generator.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
@@ -128,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="ExpressionParser.h" />
+    <ClInclude Include="Generator.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="SymbolTable.h" />

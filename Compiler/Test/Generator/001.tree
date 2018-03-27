@@ -1,0 +1,8 @@
+test : function()
+   resultType : Nil
+
+test declarations:
+|-- Statements
+|            |-- Write
+|            |       |-- 5844
+
